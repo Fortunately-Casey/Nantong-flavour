@@ -1,7 +1,7 @@
 <template>
   <div class="enterprise-claim">
     <div class="top">
-      <div class="back">
+      <div class="back" @click="back">
         <van-icon name="arrow-left" />返回
       </div>企业认领
       <div class="edit" :class="canEdit?'can-edit':''" @click="edit">编辑</div>
@@ -92,7 +92,7 @@
 
 <script>
 import { blur, Todate } from "@/common/tool/tool.js";
-import { Toast } from 'vant';
+import { Toast } from "vant";
 export default {
   data() {
     return {
@@ -140,11 +140,16 @@ export default {
       this.isShowClaim = false;
     },
     edit() {
-      if(!this.isClaimed) {
-        Toast('请先认领然后才能进行编辑！');
+      if (!this.isClaimed) {
+        Toast("请先认领然后才能进行编辑！");
         return;
       }
-      this.canEdit = true
+      this.canEdit = true;
+    },
+    back() {
+      this.$router.push({
+        path:"/enterpriseMap"
+      });
     }
   }
 };

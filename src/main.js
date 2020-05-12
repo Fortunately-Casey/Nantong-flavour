@@ -12,8 +12,8 @@ import "./assets/css/base.css";
 Vue.config.productionTip = false
 Vue.use(Vant);
 
-esriLoader.loadCss('https://js.arcgis.com/3.19/dijit/themes/tundra/tundra.css')
-esriLoader.loadCss('https://js.arcgis.com/3.19/esri/css/esri.css')
+esriLoader.loadCss('https://js.arcgis.com/3.28/dijit/themes/tundra/tundra.css')
+esriLoader.loadCss('https://js.arcgis.com/3.28/esri/css/esri.css')
 
 esriLoader.loadScript({
   dojoConfig: {
@@ -23,7 +23,7 @@ esriLoader.loadScript({
       name: 'static'
     }]
   },
-  url: 'https://js.arcgis.com/3.19/init.js'
+  url: 'https://js.arcgis.com/3.28/'
 })
 
 new Vue({

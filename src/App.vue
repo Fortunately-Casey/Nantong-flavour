@@ -30,10 +30,23 @@ input {
   font-size: 14px;
   -webkit-appearance: none;
 }
+textarea {
+  background-color: rgba(255, 255, 255, 0.8);
+}
 .van-index-bar .van-index-anchor {
   color: #728096 !important;
 }
 .van-index-bar .van-cell .van-cell__title span {
+  font-family: "FZSong" !important;
+}
+.van-index-bar__index {
+  color: #728096;
+}
+.van-index-bar__index--active {
+  color: #975b16 !important;
+}
+
+.van-action-sheet__header {
   font-family: "FZSong" !important;
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="enterprise-list">
     <div class="top">
-      <div class="back">
+      <div class="back" @click="goback">
         <van-icon name="arrow-left" />返回
       </div>企业列表
     </div>
@@ -59,6 +59,10 @@
         <van-cell title="文本" />
         <van-cell title="文本" />
         <van-cell title="文本" />
+        <van-index-anchor index="Z" />
+        <van-cell title="文本" />
+        <van-cell title="文本" />
+        <van-cell title="文本" />
       </van-index-bar>
     </div>
   </div>
@@ -68,6 +72,13 @@
 export default {
   data() {
     return {};
+  },
+  methods: {
+    goback() {
+      this.$router.push({
+        path: "/enterpriseMap"
+      });
+    }
   }
 };
 </script>
@@ -114,5 +125,25 @@ export default {
     overflow-y: auto;
     flex: 1;
   }
+}
+.van-cell {
+  position: relative;
+}
+.van-cell::after {
+  content: "定位";
+  border: none;
+  width: 45px;
+  height: 15px;
+  background: url("../../assets/image/location.png") no-repeat;
+  background-size: 15px 15px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  position: absolute;
+  top: 15px;
+  left: 0;
+  transform: translateX(250px);
+  color: #975b16;
+  font-family: "FZSong";
 }
 </style>

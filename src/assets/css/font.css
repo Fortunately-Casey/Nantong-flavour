@@ -1,0 +1,7 @@
+/*自定义字体*/
+@font-face {
+  font-family: "FZSong";
+  src: url("FZDBSJW.TTF") format("trueType");
+  font-weight: normal;
+  font-size: normal;
+}

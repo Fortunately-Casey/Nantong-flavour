@@ -1,32 +1,46 @@
+/* eslint-disable no-irregular-whitespace */
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <style>
+body,
+html {
+  width: 100%;
+  height: 100%;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "FZSong", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
+  width: 100%;
+  height: 100%;
+}
+::-webkit-scrollbar {
+  width: 0px !important;
+  height: 10px;
+}
+input {
+  border: none;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 0;
+  font-size: 14px;
+  -webkit-appearance: none;
+}
+.van-index-bar .van-index-anchor {
+  color: #728096 !important;
+}
+.van-index-bar .van-cell .van-cell__title span {
+  font-family: "FZSong" !important;
 }
 
-#nav {
-  padding: 30px;
+.van-toast__text {
+  font-family: "FZSong" !important;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+input[type="text"]:focus {
+  outline: none;
 }
 </style>

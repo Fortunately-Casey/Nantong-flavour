@@ -1,22 +1,37 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+
 
 Vue.use(VueRouter)
 
   const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    redirect: "enterpriseMap"
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: "/enterpriseMap", //企业地图
+    name: "enterpriseMap",
+    meta: {
+      requireAuth: true
+    },
+    component: resolve => require(["../views/enterprise-map/EnterpriseMap.vue"], resolve)
+  },
+  {
+    path: "/enterpriseList", //企业列表
+    name: "enterpriseList",
+    meta: {
+      requireAuth: true
+    },
+    component: resolve => require(["../views/enterprise-list/EnterpriseList.vue"], resolve)
+  },
+  {
+    path: "/enterpriseClaim", //企业认领
+    name: "enterpriseClaim",
+    meta: {
+      requireAuth: true
+    },
+    component: resolve => require(["../views/enterprise-claim/EnterpriseClaim.vue"], resolve)
   }
 ]
 

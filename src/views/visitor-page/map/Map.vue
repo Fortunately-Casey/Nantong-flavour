@@ -3,10 +3,9 @@
     <div class="top">
       <div class="search-icon"></div>
       <input type="text" placeholder="输入企业名称搜索" />
-      <div class="enterprise-button" @click="goToEnterpriseList">企业列表</div>
     </div>
     <div id="map">
-      <div id="LocateButton" style="display:block" @click="locationTo"></div>
+      <div id="LocateButton" style="display:block"></div>
     </div>
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
@@ -21,29 +20,18 @@
 <script>
 import esriLoader from "esri-loader";
 import { Indicator } from "mint-ui";
-import LocationSdk from "@/common/location-sdk";
-import { Notify } from "vant";
 export default {
   data() {
     return {
       isShowEnterprise: false,
-      enterpriseName: "一楼食品有限公司",
-      location: {},
-      map: {}
+      enterpriseName: "一楼食品有限公司"
     };
   },
-  created() {},
   mounted() {
-    // Indicator.open();
-    // setTimeout(() => {
-    this.getLocation();
-    // }, 2000);
-    // setTimeout(() => {
-    //   this.createMap();
-    // });
-    // this.$nextTick(function() {
-    //   this.createMap1();
-    // });
+    Indicator.open();
+    this.$nextTick(function() {
+      this.createMap();
+    });
   },
   methods: {
     createMap() {
@@ -55,9 +43,17 @@ export default {
           "esri/layers/TileInfo",
           "esri/geometry/Point",
           "esri/dijit/OverviewMap",
+          "esri/dijit/LocateButton",
           "dojo/domReady!"
         ])
-        .then(function([Map, WebTiledLayer, TileInfo, Point, OverviewMap]) {
+        .then(function([
+          Map,
+          WebTiledLayer,
+          TileInfo,
+          Point,
+          OverviewMap,
+          LocateButton
+        ]) {
           var map = new Map("map", {
             center: [0, 0],
             zoom: 0,
@@ -212,22 +208,16 @@ export default {
           map.addLayers([vecLayer, labelLayer]);
           map.centerAndZoom(
             new Point({
-              x: 120.86448335647579,
-              y: 32.00571294529357,
+              x: 109,
+              y: 34.5,
               spatialReference: {
                 wkid: 4326
               }
             }),
             13
           );
-
           Indicator.close();
-          map.on("click", function(result) {
-            // console.log(result);
-            vm.getLocation();
-          });
-
-          // vm.getLocation();
+          console.log();
           // var geoLocate = new LocateButton(
           //   {
           //     map: map
@@ -242,89 +232,6 @@ export default {
           // overviewMapDijit.startup(); //
         });
     },
-    createMap1() {
-      let vm = this;
-      esriLoader
-        .loadModules([
-          "esri/map",
-          "esri/geometry/Point",
-          "dojo/colors",
-          "esri/graphic",
-          "esri/layers/GraphicsLayer",
-          "esri/layers/ArcGISTiledMapServiceLayer",
-          "esri/layers/ArcGISDynamicMapServiceLayer",
-          "esri/layers/FeatureLayer",
-          "esri/geometry/Extent",
-          "esri/renderers/HeatmapRenderer",
-          "esri/config",
-          "esri/symbols/PictureMarkerSymbol",
-          "esri/symbols/SimpleMarkerSymbol",
-          "esri/symbols/TextSymbol",
-          "esri/renderers/ClassBreaksRenderer",
-          "esri/symbols/SimpleFillSymbol",
-          "esri/symbols/SimpleLineSymbol"
-          // "custom/ClusterLayer"
-        ])
-        .then(function([
-          Map,
-          Point,
-          Colors,
-          Graphic,
-          GraphicsLayer,
-          ArcGISTiledMapServiceLayer,
-          ArcGISDynamicMapServiceLayer,
-          FeatureLayer,
-          Extent,
-          HeatmapRenderer,
-          esriConfig,
-          PictureMarkerSymbol,
-          SimpleMarkerSymbol,
-          TextSymbol,
-          ClassBreaksRenderer,
-          SimpleFillSymbol,
-          SimpleLineSymbol
-          // ClusterLayer
-        ]) {
-          // var initialExtent = new Extent(
-          //   120.893798,
-          //   31.793207,
-          //   121.084289,
-          //   31.987909,
-          //   new esri.SpatialReference({ wkid: 4490 })
-          // );
-          vm.map = new Map("map", {
-            // extent: initialExtent,
-            center: [0, 0],
-            logo: false,
-            slider: false,
-            zoom: 13
-          });
-          var dynamicLayer = new ArcGISTiledMapServiceLayer(
-            "/api/arcgis/rest/services/NT/DLG_1000_201900/MapServer"
-          );
-          vm.map.addLayer(dynamicLayer);
-          let point = new Point({
-            x: vm.location.longitude,
-            y: vm.location.latitude,
-            spatialReference: {
-              wkid: 4490
-            }
-          });
-          vm.map.centerAndZoom(point, 16);
-          var startPointSymbol = new SimpleMarkerSymbol();
-          startPointSymbol.style = SimpleMarkerSymbol.STYLE_CIRCLE;
-          startPointSymbol.setSize(10);
-          startPointSymbol.setColor(new Colors("red"));
-          var startPointGraphic = new Graphic(point, startPointSymbol);
-          let graphiclayer = new GraphicsLayer({
-            id: "location"
-          });
-          graphiclayer.add(startPointGraphic);
-          vm.map.addLayer(graphiclayer);
-
-          // vm.map.add(startPointGraphic);
-        });
-    },
     goToClaim() {
       this.$router.push({
         path: "/enterpriseClaim"
@@ -335,102 +242,7 @@ export default {
         path: "/enterpriseList"
       });
     },
-    getLocation() {
-      let vm = this;
-      LocationSdk.getLocation({
-        success: res => {
-          vm.location = res;
-          Notify({
-            type: "primary",
-            message: `${vm.location.longitude};${vm.location.latitude}`
-          });
-          // alert(vm.location.longitude);
-          vm.createMap1();
-        },
-        error: res => {
-          Notify({
-            type: "primary",
-            message: "获取定位失败" + ":" + JSON.stringify(res)
-          });
-          // alert(JSON.stringify(res));
-          self.location = {
-            longitude: "-1",
-            latitude: "-1"
-          };
-        }
-      });
-    },
-    locationTo() {
-      let vm = this;
-      LocationSdk.getLocation({
-        success: res => {
-          vm.location = res;
-          Notify({
-            type: "primary",
-            message: `${vm.location.longitude};${vm.location.latitude}`
-          });
-          esriLoader
-            .loadModules([
-              "esri/map",
-              "esri/geometry/Point",
-              "dojo/colors",
-              "esri/graphic",
-              "esri/layers/ArcGISTiledMapServiceLayer",
-              "esri/layers/ArcGISDynamicMapServiceLayer",
-              "esri/layers/FeatureLayer",
-              "esri/geometry/Extent",
-              "esri/renderers/HeatmapRenderer",
-              "esri/config",
-              "esri/symbols/PictureMarkerSymbol",
-              "esri/symbols/SimpleMarkerSymbol",
-              "esri/symbols/TextSymbol",
-              "esri/renderers/ClassBreaksRenderer",
-              "esri/symbols/SimpleFillSymbol",
-              "esri/symbols/SimpleLineSymbol"
-              // "custom/ClusterLayer"
-            ])
-            .then(function([
-              Map,
-              Point,
-              Colors,
-              Graphic,
-              ArcGISTiledMapServiceLayer,
-              ArcGISDynamicMapServiceLayer,
-              FeatureLayer,
-              Extent,
-              HeatmapRenderer,
-              esriConfig,
-              PictureMarkerSymbol,
-              SimpleMarkerSymbol,
-              TextSymbol,
-              ClassBreaksRenderer,
-              SimpleFillSymbol,
-              SimpleLineSymbol
-              // ClusterLayer
-            ]) {
-              let point = new Point({
-                x: vm.location.longitude,
-                y: vm.location.latitude,
-                spatialReference: {
-                  wkid: 4490
-                }
-              });
-              vm.map.centerAndZoom(point, 16);
-            });
-        },
-        error: res => {
-          Notify({
-            type: "primary",
-            message: "获取定位失败" + ":" + JSON.stringify(res)
-          });
-          // alert(JSON.stringify(res));
-          self.location = {
-            longitude: "-1",
-            latitude: "-1"
-          };
-        }
-      });
-    }
+    getLocation() {}
   }
 };
 </script>
@@ -443,7 +255,7 @@ export default {
   flex-direction: column;
   .top {
     height: 50px;
-    background: url("../../assets/image/top-bg.png") no-repeat;
+    background: url("../../../assets/image/top-bg.png") no-repeat;
     background-position: right bottom;
     background-size: cover;
     display: flex;
@@ -451,7 +263,7 @@ export default {
     position: relative;
     input {
       padding-left: 30px;
-      width: 75%;
+      width: 93%;
       height: 34px;
       border-radius: 5px;
       font-family: "FZSong";
@@ -461,7 +273,7 @@ export default {
     .search-icon {
       width: 14px;
       height: 14px;
-      background: url("../../assets/image/search-icon.png") no-repeat;
+      background: url("../../../assets/image/search-icon.png") no-repeat;
       background-size: 100% 100%;
       position: absolute;
       left: 20px;
@@ -480,21 +292,20 @@ export default {
     flex: 1;
     position: relative;
     #LocateButton {
-      width: 35px;
-      height: 35px;
-      background: url("../../assets/image/location.png") no-repeat;
+      width: 15px;
+      height: 15px;
+      background: url("../../../assets/image/location.png") no-repeat;
       background-size: 100% 100%;
       position: absolute;
       left: 20px;
       bottom: 30px;
-      z-index: 999;
     }
   }
   .content {
     .box {
       width: 98px;
       height: 100px;
-      background: url("../../assets/image/box.png") no-repeat;
+      background: url("../../../assets/image/box.png") no-repeat;
       background-size: 100% 100%;
       margin: 0 auto;
     }
@@ -508,7 +319,7 @@ export default {
     .entry-button {
       width: 267px;
       height: 42px;
-      background: url("../../assets/image/claim-entry.png") no-repeat;
+      background: url("../../../assets/image/claim-entry.png") no-repeat;
       background-size: 100% 100%;
       margin: 20px auto;
     }

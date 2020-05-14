@@ -1,7 +1,6 @@
 <template>
   <div class="enterprise-list">
     <div class="top">
-      <div class="back" @click="goback"><van-icon name="arrow-left" />返回</div>
       企业列表
     </div>
     <div class="content">
@@ -90,7 +89,7 @@ export default {
   padding-top: 50px;
   .top {
     height: 50px;
-    background: url("../../assets/image/top-bg.png") no-repeat;
+    background: url("../../../assets/image/top-bg.png") no-repeat;
     background-position: right bottom;
     background-size: cover;
     position: fixed;
@@ -103,21 +102,6 @@ export default {
     top: 0px;
     left: 0px;
     width: 100%;
-    .back {
-      width: 50px;
-      height: 18px;
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      line-height: 18px;
-      transform: translateY(-50%);
-      font-size: 16px;
-      font-family: "FZSong";
-      text-align: right;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
   }
   .content {
     background-color: #ecf1f7;
@@ -127,5 +111,22 @@ export default {
 }
 .van-cell {
   position: relative;
+}
+.van-cell::after {
+  content: "定位";
+  border: none;
+  width: 45px;
+  height: 15px;
+  background: url("../../../assets/image/location.png") no-repeat;
+  background-size: 15px 15px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  position: absolute;
+  top: 15px;
+  left: 0;
+  transform: translateX(280px);
+  color: #975b16;
+  font-family: "FZSong";
 }
 </style>

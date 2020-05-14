@@ -4,7 +4,7 @@
       <div class="back" @click="back">
         <van-icon name="arrow-left" />返回
       </div>企业认领
-      <div class="edit" :class="canEdit?'can-edit':''" @click="edit">编辑</div>
+      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">编辑</div>
     </div>
     <div class="content">
       <div class="enterprise-info">
@@ -22,7 +22,7 @@
         </div>
         <div class="item">
           <div class="name">成立时间</div>
-          <div class="value" @click="showCreateDate">{{toDate(createTime)}}</div>
+          <div class="value" @click="showCreateDate">{{ toDate(createTime) }}</div>
         </div>
         <div class="item" style="padding:0;margin:0 16px">
           <div class="name">企业地址</div>
@@ -55,6 +55,12 @@
           <van-uploader v-model="fileList" multiple :after-read="afterRead" max-count="2" />
         </div>
       </div>
+      <div class="special-offers">
+        <div class="item">
+          <div class="name">优惠信息</div>
+        </div>
+      </div>
+
       <div class="bottom" v-if="isClaimed && !canEdit">
         <div class="claim-cancel"></div>
         <div class="punch-button"></div>
@@ -66,10 +72,7 @@
       <div class="claim-button" v-if="!isClaimed" @click="isShowClaim = true"></div>
       <van-popup v-model="isShowClaim" round>
         <div class="commit-affirm">
-          <div class="text">
-            请确认这是您的企业后再进行提交哦～
-            是否确认提交？
-          </div>
+          <div class="text">请确认这是您的企业后再进行提交哦～ 是否确认提交？</div>
           <div class="buttons">
             <div class="canncel" @click="isShowClaim = false">再想想</div>
             <div class="confirm" @click="comfirmCommit">确认提交</div>
@@ -148,7 +151,7 @@ export default {
     },
     back() {
       this.$router.push({
-        path:"/enterpriseMap"
+        path: "/enterpriseMap"
       });
     }
   }
@@ -171,17 +174,17 @@ export default {
     line-height: 50px;
     font-family: "FZSong";
     color: #fff;
-    font-size: 16px;
+    font-size: 18px;
     width: 100%;
     .back {
-      width: 45px;
+      width: 50px;
       height: 18px;
       position: absolute;
       left: 16px;
       top: 50%;
       line-height: 18px;
       transform: translateY(-50%);
-      font-size: 14px;
+      font-size: 16px;
       font-family: "FZSong";
       text-align: right;
       display: flex;
@@ -198,7 +201,7 @@ export default {
       transform: translateY(-50%);
       color: rgba(255, 255, 255, 0.6);
       font-family: "FZSong";
-      font-size: 14px;
+      font-size: 16px;
     }
     .can-edit {
       color: #fff;
@@ -218,8 +221,8 @@ export default {
         align-items: center;
         .name {
           font-family: "FZSong";
-          font-size: 14px;
-          width: 60px;
+          font-size: 16px;
+          width: 65px;
           text-align: center;
         }
         .value {
@@ -230,17 +233,19 @@ export default {
           align-items: center;
           color: #728096;
           font-family: "FZSong";
+          font-size: 16px;
           input {
             height: 40px;
             text-align: right;
             color: #728096;
             font-family: "FZSong";
-            font-size: 14px;
+            font-size: 16px;
           }
         }
       }
     }
-    .enterprise-explain {
+    .enterprise-explain,
+    .special-offers {
       background-color: #fff;
       margin-top: 12px;
       .item {
@@ -251,8 +256,8 @@ export default {
         align-items: center;
         .name {
           font-family: "FZSong";
-          font-size: 14px;
-          width: 60px;
+          font-size: 16px;
+          width: 65px;
           text-align: center;
         }
       }
@@ -276,21 +281,23 @@ export default {
       padding: 0 16px;
       display: flex;
       .left {
-        width: 60px;
+        width: 70px;
         font-family: "FZSong";
-        font-size: 14px;
+        font-size: 16px;
         text-align: center;
         line-height: 100px;
+        margin-right: 15px;
       }
       .right {
         flex: 1;
         display: flex;
         align-items: center;
+        padding-top: 10px;
       }
     }
     .claim-button {
-      width: 237px;
-      height: 35px;
+      width: 260px;
+      height: 36px;
       background: url("../../assets/image/claim-button.png") no-repeat;
       background-size: 100% 100%;
       position: absolute;
@@ -301,9 +308,10 @@ export default {
     .bottom {
       width: 100%;
       height: 40px;
-      position: absolute;
-      bottom: 12px;
-      left: 0;
+      // position: absolute;
+      // bottom: 12px;
+      // left: 0;
+      padding-top: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -338,7 +346,7 @@ export default {
       width: 260px;
       height: 90px;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 16px;
       .text {
         margin-top: 20px;
         padding: 0 15px;

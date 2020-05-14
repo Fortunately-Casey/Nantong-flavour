@@ -1,8 +1,6 @@
 <template>
   <div class="visitor">
-    <div class="content">
-      <router-view></router-view>
-    </div>
+    <router-view></router-view>
     <div class="bottom-tab">
       <div class="left" @click="choseTab(0)">
         <div class="icon" :class="chosedIndex === 0 ? 'active' : ''"></div>
@@ -28,6 +26,15 @@ export default {
   methods: {
     choseTab(index) {
       this.chosedIndex = index;
+      if (index === 0) {
+        this.$router.push({
+          path: "/visitorPage/visitorMap"
+        });
+      } else {
+        this.$router.push({
+          path: "/visitorPage/factoryList"
+        });
+      }
     }
   }
 };
@@ -39,6 +46,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding-bottom: 60px;
   .content {
     flex: 1;
   }
@@ -47,6 +55,9 @@ export default {
     height: 60px;
     background: #ffffff;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+    position: fixed;
+    left: 0;
+    bottom: 0;
     display: flex;
     .left,
     .right {
@@ -81,7 +92,7 @@ export default {
       flex-direction: column;
       align-items: center;
       .icon {
-        width: 22px;
+        width: 20px;
         height: 20px;
         background: url("../../assets/image/enterprise-icon.png") no-repeat;
         background-size: 100% 100%;

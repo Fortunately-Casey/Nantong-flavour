@@ -35,17 +35,24 @@ textarea {
 }
 .van-index-bar .van-index-anchor {
   color: #728096 !important;
+  font-size: 16px;
 }
 .van-index-bar .van-cell .van-cell__title span {
   font-family: "FZSong" !important;
+  font-size: 18px;
 }
 .van-index-bar__index {
   color: #728096;
 }
+.van-index-bar__index {
+  font-size: 14px !important;
+}
 .van-index-bar__index--active {
   color: #975b16 !important;
 }
-
+.van-index-bar__sidebar {
+  right: 5px !important;
+}
 .van-action-sheet__header {
   font-family: "FZSong" !important;
 }

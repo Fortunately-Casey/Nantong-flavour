@@ -114,7 +114,6 @@ export function phoneReg(value) {
 
 export function getPosition() {
   return new Promise((resolve, reject) => {
-      console.log(navigator)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         function(position) {

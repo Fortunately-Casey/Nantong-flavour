@@ -1,28 +1,41 @@
 <template>
   <div class="enterprise-claim">
     <div class="top">
-      <div class="back" @click="back">
-        <van-icon name="arrow-left" />返回
-      </div>企业认领
-      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">编辑</div>
+      <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
+      企业认领
+      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">
+        编辑
+      </div>
     </div>
     <div class="content">
       <div class="enterprise-info">
         <div class="item">
           <div class="name">企业名称</div>
           <div class="value">
-            <input type="text" @blur="blur" v-model="enterpriseName" :disabled="!canEdit" />
+            <input
+              type="text"
+              @blur="blur"
+              v-model="enterpriseName"
+              :disabled="!canEdit"
+            />
           </div>
         </div>
         <div class="item">
           <div class="name">企业电话</div>
           <div class="value">
-            <input type="text" @blur="blur" v-model="phoneNumber" :disabled="!canEdit" />
+            <input
+              type="text"
+              @blur="blur"
+              v-model="phoneNumber"
+              :disabled="!canEdit"
+            />
           </div>
         </div>
         <div class="item">
           <div class="name">成立时间</div>
-          <div class="value" @click="showCreateDate">{{ toDate(createTime) }}</div>
+          <div class="value" @click="showCreateDate">
+            {{ toDate(createTime) }}
+          </div>
         </div>
         <div class="item" style="padding:0;margin:0 16px">
           <div class="name">企业地址</div>
@@ -46,21 +59,72 @@
           <div class="name">企业说明</div>
         </div>
         <div class="text-area">
-          <textarea name id maxlength="50" v-model="enterpriseExplain" :disabled="!canEdit"></textarea>
+          <textarea
+            name
+            id
+            maxlength="50"
+            v-model="enterpriseExplain"
+            :disabled="!canEdit"
+          ></textarea>
         </div>
       </div>
       <div class="enterprise-photo">
         <div class="left">企业照片</div>
         <div class="right">
-          <van-uploader v-model="fileList" multiple :after-read="afterRead" max-count="2" />
+          <van-uploader
+            v-model="fileList"
+            multiple
+            :after-read="afterRead"
+            max-count="2"
+          />
         </div>
       </div>
       <div class="special-offers">
         <div class="item">
           <div class="name">优惠信息</div>
+          <div class="value">
+            <div class="add-button" @click="isShowAdd = true">
+              <div class="add-icon"></div>
+              新增优惠
+            </div>
+          </div>
         </div>
       </div>
-
+      <scroll class="wrapper">
+        <ul class="offers-list">
+          <!-- <span>暂无优惠信息</span> -->
+          <li class="offer-item">
+            <div class="offer-name">
+              <div class="icon"></div>
+              全店满500减50
+            </div>
+            <div class="offer-address">
+              活动时间:2020-05-20-2020-05-30
+            </div>
+            <div class="offer-time">活动地址:工农路一柱楼前台</div>
+          </li>
+          <li class="offer-item">
+            <div class="offer-name">
+              <div class="icon"></div>
+              全店满500减50
+            </div>
+            <div class="offer-address">
+              活动时间:2020-05-20-2020-05-30
+            </div>
+            <div class="offer-time">活动地址:工农路一柱楼前台</div>
+          </li>
+          <li class="offer-item">
+            <div class="offer-name">
+              <div class="icon"></div>
+              全店满500减50
+            </div>
+            <div class="offer-address">
+              活动时间:2020-05-20-2020-05-30
+            </div>
+            <div class="offer-time">活动地址:工农路一柱楼前台</div>
+          </li>
+        </ul>
+      </scroll>
       <div class="bottom" v-if="isClaimed && !canEdit">
         <div class="claim-cancel"></div>
         <div class="punch-button"></div>
@@ -69,10 +133,16 @@
         <div class="cancel"></div>
         <div class="save-button"></div>
       </div>
-      <div class="claim-button" v-if="!isClaimed" @click="isShowClaim = true"></div>
+      <div
+        class="claim-button"
+        v-if="!isClaimed"
+        @click="isShowClaim = true"
+      ></div>
       <van-popup v-model="isShowClaim" round>
         <div class="commit-affirm">
-          <div class="text">请确认这是您的企业后再进行提交哦～ 是否确认提交？</div>
+          <div class="text">
+            请确认这是您的企业后再进行提交哦～ 是否确认提交？
+          </div>
           <div class="buttons">
             <div class="canncel" @click="isShowClaim = false">再想想</div>
             <div class="confirm" @click="comfirmCommit">确认提交</div>
@@ -90,12 +160,39 @@
         @cancel="canncelCreateDate"
       />
     </div>
+    <van-dialog v-model="isShowAdd" title="新增优惠" show-cancel-button>
+      <van-field
+        v-model="specialTitle"
+        name="优惠标题"
+        label="优惠标题"
+        placeholder="请输入优惠标题"
+        :rules="[{ required: true, message: '请填写优惠标题' }]"
+      />
+      <van-field
+        readonly
+        clickable
+        name="calendar"
+        :value="date"
+        label="活动时间"
+        placeholder="请选择活动时间"
+        @click="show = true"
+      />
+      <van-field
+        v-model="specialAddress"
+        name="优惠地址"
+        label="优惠地址"
+        placeholder="请输入优惠地址"
+        :rules="[{ required: true, message: '请填写优惠地址' }]"
+      />
+    </van-dialog>
+    <van-calendar v-model="show" type="range" @confirm="onConfirm" />
   </div>
 </template>
 
 <script>
 import { blur, Todate } from "@/common/tool/tool.js";
 import { Toast } from "vant";
+import Scroll from "@/components/Scroll";
 export default {
   data() {
     return {
@@ -112,7 +209,12 @@ export default {
       isShowCreateDate: false,
       isShowClaim: false,
       canEdit: false,
-      isClaimed: false
+      isClaimed: false,
+      isShowAdd: false,
+      specialTitle: "",
+      specialAddress: "",
+      date: "",
+      show: false
     };
   },
   methods: {
@@ -121,6 +223,12 @@ export default {
     },
     toDate(date) {
       return Todate(date);
+    },
+    onConfirm(date) {
+      console.log(date);
+      const [start, end] = date;
+      this.show = false;
+      this.date = `${this.toDate(start)} - ${this.toDate(end)}`;
     },
     confirmCreateDate(date) {
       this.createTime = this.toDate(date);
@@ -154,6 +262,9 @@ export default {
         path: "/enterpriseMap"
       });
     }
+  },
+  components: {
+    Scroll
   }
 };
 </script>
@@ -260,7 +371,33 @@ export default {
           width: 65px;
           text-align: center;
         }
+        .value {
+          flex: 1;
+          height: 44px;
+          display: flex;
+          flex-direction: row-reverse;
+          align-items: center;
+          color: #728096;
+          font-family: "FZSong";
+          font-size: 16px;
+          .add-button {
+            color: #975b16;
+            font-family: "FZSong";
+            position: relative;
+            .add-icon {
+              width: 8px;
+              height: 8px;
+              background: url("../../assets/image/add-icon.png") no-repeat;
+              background-size: 100% 100%;
+              position: absolute;
+              left: -10px;
+              top: 50%;
+              transform: translateY(-50%);
+            }
+          }
+        }
       }
+
       .text-area {
         textarea {
           width: 100%;
@@ -295,22 +432,65 @@ export default {
         padding-top: 10px;
       }
     }
+    .wrapper {
+      width: 100%;
+      overflow: hidden;
+      .offers-list {
+        width: 750px;
+        min-height: 68px;
+        background-color: #fff;
+        overflow: hidden;
+        span {
+          font-family: "FZSong";
+          font-size: 14px;
+          color: #728096;
+        }
+        .offer-item {
+          float: left;
+          width: 247px;
+          height: 119px;
+          background: url("../../assets/image/offer-bg.png") no-repeat;
+          background-size: 100% 100%;
+          padding-left: 20px;
+          .offer-name {
+            display: flex;
+            align-items: center;
+            height: 35px;
+            margin-top: 25px;
+            color: #975b16;
+            font-family: "FZSong";
+            font-size: 16px;
+            .icon {
+              width: 16px;
+              height: 16px;
+              background: url("../../assets/image/gift.png") no-repeat;
+              background-size: 100% 100%;
+            }
+          }
+          .offer-address,
+          .offer-time {
+            height: 25px;
+            line-height: 25px;
+            color: #d69e2e;
+            font-family: "FZSong";
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
     .claim-button {
       width: 260px;
       height: 36px;
       background: url("../../assets/image/claim-button.png") no-repeat;
       background-size: 100% 100%;
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
+      margin: 0 auto;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
     .bottom {
       width: 100%;
       height: 40px;
-      // position: absolute;
-      // bottom: 12px;
-      // left: 0;
       padding-top: 30px;
       display: flex;
       align-items: center;

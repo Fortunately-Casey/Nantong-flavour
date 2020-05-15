@@ -36,13 +36,13 @@ export default {
   mounted() {
     // Indicator.open();
     // setTimeout(() => {
-    this.getLocation();
+    // this.getLocation();
     // }, 2000);
     // setTimeout(() => {
     //   this.createMap();
     // });
     // this.$nextTick(function() {
-    //   this.createMap1();
+    this.createMap1();
     // });
   },
   methods: {
@@ -300,12 +300,23 @@ export default {
             zoom: 13
           });
           var dynamicLayer = new ArcGISTiledMapServiceLayer(
-            "/api/arcgis/rest/services/NT/DLG_1000_201900/MapServer"
+            "/gis/arcgis/rest/services/NT/DLG_1000_201900/MapServer"
+          );
+          var dynamicLayer1 = new ArcGISDynamicMapServiceLayer(
+            "/map/arcgis/rest/services/NTWD/NTWDMapService/MapServer"
           );
           vm.map.addLayer(dynamicLayer);
+          vm.map.addLayer(dynamicLayer1);
+          // let point = new Point({
+          //   x: vm.location.longitude,
+          //   y: vm.location.latitude,
+          //   spatialReference: {
+          //     wkid: 4490
+          //   }
+          // });
           let point = new Point({
-            x: vm.location.longitude,
-            y: vm.location.latitude,
+            x: 120.86448335647579,
+            y: 32.00571294529357,
             spatialReference: {
               wkid: 4490
             }
@@ -482,10 +493,10 @@ export default {
     #LocateButton {
       width: 35px;
       height: 35px;
-      background: url("../../assets/image/location.png") no-repeat;
+      background: url("../../assets/image/location-button.png") no-repeat;
       background-size: 100% 100%;
       position: absolute;
-      left: 20px;
+      right: 20px;
       bottom: 30px;
       z-index: 999;
     }

@@ -30,6 +30,7 @@ Vue.use(Mint);
 // });
 esriLoader.loadCss("https://js.arcgis.com/3.19/dijit/themes/tundra/tundra.css");
 esriLoader.loadCss("https://js.arcgis.com/3.19/esri/css/esri.css");
+// esriLoader.loadCss("/arcgis/arcgis_js_api/library/3.19/3.19/esri/css/esri.css");
 
 esriLoader.loadScript({
   dojoConfig: {
@@ -42,6 +43,7 @@ esriLoader.loadScript({
     ]
   },
   url: "https://js.arcgis.com/3.19/init.js"
+  // url: "/arcgis/arcgis_js_api/library/3.19/3.19/init.js"
 });
 new Vue({
   router,

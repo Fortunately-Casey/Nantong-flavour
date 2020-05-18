@@ -23,6 +23,15 @@ module.exports = {
     hotOnly: true,
     /* 使用代理 */
     proxy: {
+      "/api": {
+        /* 目标代理服务器地址 */
+        target: "http://223.113.1.77:10058",
+        pathRewrite: {
+          "^/api": "/api"
+        },
+        /* 允许跨域 */
+        changeOrigin: true
+      },
       "/gis": {
         /* 目标代理服务器地址 */
         target: "http://223.113.1.77:26080",

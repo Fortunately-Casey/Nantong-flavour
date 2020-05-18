@@ -98,9 +98,7 @@
               <div class="icon"></div>
               全店满500减50
             </div>
-            <div class="offer-address">
-              活动时间:2020-05-20-2020-05-30
-            </div>
+            <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
             <div class="offer-time">活动地址:工农路一柱楼前台</div>
           </li>
           <li class="offer-item">
@@ -108,9 +106,7 @@
               <div class="icon"></div>
               全店满500减50
             </div>
-            <div class="offer-address">
-              活动时间:2020-05-20-2020-05-30
-            </div>
+            <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
             <div class="offer-time">活动地址:工农路一柱楼前台</div>
           </li>
           <li class="offer-item">
@@ -118,9 +114,7 @@
               <div class="icon"></div>
               全店满500减50
             </div>
-            <div class="offer-address">
-              活动时间:2020-05-20-2020-05-30
-            </div>
+            <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
             <div class="offer-time">活动地址:工农路一柱楼前台</div>
           </li>
         </ul>
@@ -193,15 +187,16 @@
 import { blur, Todate } from "@/common/tool/tool.js";
 import { Toast } from "vant";
 import Scroll from "@/components/Scroll";
+import * as api from "@/service/apiList";
+import http from "@/service/service";
 export default {
   data() {
     return {
       createTime: new Date(),
-      enterpriseName: "一柱楼食品有限公司",
-      phoneNumber: "0513-98273637",
-      enterpriseAddress: "江苏省南通市崇川区工农路172号",
-      enterpriseExplain:
-        "由各种物质组成的巨型球状天体，叫做星球。由各种物质组成的巨型球状天体，叫做星球。",
+      enterpriseName: "",
+      phoneNumber: "",
+      enterpriseAddress: "",
+      enterpriseExplain: "",
       fileList: [],
       minDate: new Date(2000, 1, 1),
       maxDate: new Date(2055, 1, 1),
@@ -217,7 +212,25 @@ export default {
       show: false
     };
   },
+  created() {
+    this.getDetail();
+  },
   methods: {
+    getDetail() {
+      let vm = this;
+      http
+        .get(api.COMPANYINFO, {
+          companyID: this.$route.query.companyID
+        })
+        .then(resp => {
+          console.log(resp.data.data);
+          vm.enterpriseName = resp.data.data.companyName;
+          vm.phoneNumber = resp.data.data.linkPhone;
+          vm.createTime = resp.data.data.companyOffers.createTime;
+          vm.enterpriseAddress = resp.data.data.address;
+          vm.enterpriseExplain = resp.data.data.description;
+        });
+    },
     blur() {
       blur();
     },
@@ -268,7 +281,6 @@ export default {
   }
 };
 </script>
-
 <style lang="less" scoped>
 .enterprise-claim {
   width: 100%;

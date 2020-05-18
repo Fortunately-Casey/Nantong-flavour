@@ -3,9 +3,18 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-const routes = [{
+const routes = [
+  {
     path: "/",
-    redirect: "enterpriseMap"
+    redirect: "login"
+  },
+  {
+    path: "/login", //登录
+    name: "login",
+    meta: {
+      requireAuth: true
+    },
+    component: resolve => require(["../views/login/Login.vue"], resolve)
   },
   {
     path: "/enterpriseMap", //企业地图
@@ -41,7 +50,8 @@ const routes = [{
     },
     component: resolve =>
       require(["../views/visitor-page/VisitorPage.vue"], resolve),
-    children: [{
+    children: [
+      {
         path: "/",
         name: "default",
         redirect: "visitorMap"
@@ -67,6 +77,15 @@ const routes = [{
           ], resolve)
       }
     ]
+  },
+  {
+    path: "/enterpriseDetail", //企业认领
+    name: "enterpriseDetail",
+    meta: {
+      requireAuth: true
+    },
+    component: resolve =>
+      require(["../views/enterprise-detail/EnterpriseDetail.vue"], resolve)
   }
 ];
 

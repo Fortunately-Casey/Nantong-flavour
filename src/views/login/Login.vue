@@ -4,11 +4,10 @@
     :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }"
   >
     <div class="logo-top"></div>
-    <div class="top-circle"></div>
-    <div class="left-circle"></div>
-    <div class="right-circle"></div>
-    <div class="login-title"></div>
+    <div class="top-title"></div>
+    <div class="top-title2"></div>
     <div class="bottom-logo"></div>
+    <div class="bottom-title">技术支持：南通市测绘院有限公司</div>
     <div class="login-box">
       <div class="login" v-if="isLogin">
         <div class="input">
@@ -157,54 +156,38 @@ export default {
 <style lang="less" scoped>
 .login-content {
   height: 100%;
-  background-color: #fff;
+  background: url("../../assets/image/login-bg.png");
+  background-size: 100% 100%;
   position: relative;
   overflow: hidden;
   .logo-top {
-    width: 243px;
-    height: 149px;
-    // background: url("../../assets/image/top-logo.png");
+    width: 320px;
+    height: 306px;
+    background: url("../../assets/image/nantong-bg.png") no-repeat;
     background-size: 100% 100%;
     margin: 0 auto;
-    margin-top: 40px;
+    background-position: 0px 15px;
   }
-  .top-circle {
-    width: 109px;
-    height: 63px;
-    // background: url("../../assets/image/circle-top.png") no-repeat;
+  .top-title {
+    width: 34px;
+    height: 152px;
+    background: url("../../assets/image/top-title.png") no-repeat;
     background-size: 100% 100%;
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 240px;
+    top: 60px;
   }
-  .left-circle {
-    width: 42px;
-    height: 83px;
-    // background: url("../../assets/image/circle.left.png") no-repeat;
+  .top-title2 {
+    width: 18px;
+    height: 101px;
+    background: url("../../assets/image/top-title2.png") no-repeat;
     background-size: 100% 100%;
     position: absolute;
-    left: 0;
-    top: 400px;
-  }
-  .right-circle {
-    width: 35px;
-    height: 40px;
-    // background: url("../../assets/image/circle-right.png") no-repeat;
-    background-size: 100% 100%;
-    position: absolute;
-    right: 0;
-    top: 280px;
-  }
-  .login-title {
-    width: 284px;
-    height: 18px;
-    // background: url("../../assets/image/login-title.png") no-repeat;
-    background-size: 100% 100%;
-    margin: 0 auto;
-    margin-top: 15px;
+    left: 300px;
+    top: 30px;
   }
   .login-box {
-    margin-top: 25px;
+    margin-top: 5px;
     .input {
       margin: 20px auto;
       width: 230px;
@@ -220,11 +203,11 @@ export default {
         transform: translateY(-50%);
       }
       .user-icon {
-        // background: url("../../assets/image/username.png") no-repeat;
+        background: url("../../assets/image/username.png") no-repeat;
         background-size: 100% 100%;
       }
       .pw-icon {
-        // background: url("../../assets/image/password.png") no-repeat;
+        background: url("../../assets/image/password.png") no-repeat;
         background-size: 100% 100%;
       }
       input {
@@ -237,7 +220,7 @@ export default {
       }
       input:focus {
         outline: none;
-        border: 1px solid #64b3ed;
+        border: 1px solid #975b16;
       }
     }
     .switch-button {
@@ -247,7 +230,7 @@ export default {
       span {
         float: right;
         font-size: 12px;
-        color: #64b3ed;
+        color: #975b16;
         margin-right: 20px;
       }
     }
@@ -256,7 +239,7 @@ export default {
       width: 230px;
       height: 40px;
       border-radius: 20px;
-      background-color: #64b3ed;
+      background-color: #975b16;
       color: #fff;
       margin: 0 auto;
       text-align: center;
@@ -267,14 +250,22 @@ export default {
     }
   }
   .bottom-logo {
-    width: 291px;
-    height: 40px;
-    // background: url("../../assets/image/bottom-logo.png") no-repeat;
+    width: 160px;
+    height: 18px;
+    background: url("../../assets/image/bottom-logo.png") no-repeat;
     background-size: 100% 100%;
     position: absolute;
     left: 50%;
-    bottom: 10px;
+    bottom: 40px;
     transform: translateX(-50%);
+  }
+  .bottom-title {
+    position: absolute;
+    left: 0;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
   }
 }
 </style>

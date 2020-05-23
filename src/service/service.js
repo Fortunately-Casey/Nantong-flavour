@@ -26,6 +26,30 @@ http.post = function(apiUrl, params, vue) {
     });
 };
 
+http.upload = function(apiUrl, params, vue) {
+  let token = window.localStorage.getItem("token");
+  const url = getURL(apiUrl);
+  return axios
+    .post(url, params, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        token: token
+      }
+    })
+    .then(resp => {
+      if (resp.data.errorCode == "03009") {
+        vue.$router.push({
+          path: "/login"
+        });
+        return;
+      }
+      return Promise.resolve(resp);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
 http.get = function(apiUrl, params, vue) {
   let token = window.localStorage.getItem("token");
   const url = getURL(apiUrl);

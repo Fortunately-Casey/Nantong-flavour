@@ -179,6 +179,8 @@ export default {
                   }
                   console.log(resp.data.data);
                 });
+              } else {
+                Indicator.close();
               }
             });
           });
@@ -374,7 +376,6 @@ export default {
       background: url("../../assets/image/claim-entry.png") no-repeat;
       background-size: 100% 100%;
       margin: 20px auto;
-      background-color: green;
     }
   }
 }

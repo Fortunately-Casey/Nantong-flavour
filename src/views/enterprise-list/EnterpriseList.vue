@@ -5,74 +5,50 @@
       企业列表
     </div>
     <div class="content">
-      <van-index-bar>
-        <van-index-anchor index="A" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="B" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="C" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="D" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="E" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="F" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="G" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="H" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="I" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="J" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="K" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="L" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="M" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="Z" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
+      <van-index-bar :index-list="indexList">
+        <div v-for="(item, index) in barList" :key="index">
+          <van-index-anchor :index="item.key" />
+          <van-cell
+            :title="v.companyName"
+            v-for="(v, i) in item.items"
+            :key="i"
+          />
+        </div>
       </van-index-bar>
     </div>
   </div>
 </template>
 
 <script>
+import * as api from "@/service/apiList";
+import http from "@/service/service";
 export default {
   data() {
-    return {};
+    return {
+      barList: [],
+      indexList: []
+    };
+  },
+  created() {
+    this.getCompanyList();
   },
   methods: {
+    getCompanyList() {
+      let vm = this;
+      http.get(api.COMPANYLIST, {}, vm).then(resp => {
+        let res = resp.data.data;
+        let arr = [];
+        for (var k in res) {
+          arr.push({
+            key: k,
+            items: res[k]
+          });
+          vm.indexList.push(k);
+        }
+        console.log(arr);
+        vm.barList = arr;
+      });
+    },
     goback() {
       this.$router.push({
         path: "/enterpriseMap"

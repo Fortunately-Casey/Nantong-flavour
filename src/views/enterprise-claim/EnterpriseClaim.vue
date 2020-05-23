@@ -1,40 +1,31 @@
 <template>
   <div class="enterprise-claim">
     <div class="top">
-      <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
-      企业认领
-      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">
-        编辑
-      </div>
+      <div class="back" @click="back">
+        <van-icon name="arrow-left" />返回
+      </div>企业认领
+      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">编辑</div>
     </div>
     <div class="content">
       <div class="enterprise-info">
         <div class="item">
           <div class="name">企业名称</div>
           <div class="value">
-            <input
-              type="text"
-              @blur="blur"
-              v-model="enterpriseName"
-              :disabled="!canEdit"
-            />
+            <input type="text" @blur="blur" v-model="enterpriseName" :disabled="!canEdit" />
           </div>
         </div>
         <div class="item">
           <div class="name">企业电话</div>
           <div class="value">
-            <input
-              type="text"
-              @blur="blur"
-              v-model="phoneNumber"
-              :disabled="!canEdit"
-            />
+            <input type="text" @blur="blur" v-model="phoneNumber" :disabled="!canEdit" />
           </div>
         </div>
         <div class="item">
-          <div class="name">成立时间</div>
-          <div class="value" @click="showCreateDate">
-            {{ toDate(createTime) }}
+          <div class="name">营业时间</div>
+          <div class="value">
+            <!-- {{ startTime }} -->
+            <div class="start" @click="showStartTime">{{ startTime }}</div>-
+            <div class="end" @click="showEndTime">{{ endTime }}</div>
           </div>
         </div>
         <div class="item" style="padding:0;margin:0 16px">
@@ -59,24 +50,13 @@
           <div class="name">企业说明</div>
         </div>
         <div class="text-area">
-          <textarea
-            name
-            id
-            maxlength="50"
-            v-model="enterpriseExplain"
-            :disabled="!canEdit"
-          ></textarea>
+          <textarea name id maxlength="50" v-model="enterpriseExplain" :disabled="!canEdit"></textarea>
         </div>
       </div>
       <div class="enterprise-photo">
         <div class="left">企业照片</div>
         <div class="right">
-          <van-uploader
-            v-model="fileList"
-            multiple
-            :after-read="afterRead"
-            max-count="2"
-          />
+          <van-uploader v-model="fileList" multiple :after-read="afterRead" max-count="2" />
         </div>
       </div>
       <div class="special-offers">
@@ -84,8 +64,7 @@
           <div class="name">优惠信息</div>
           <div class="value">
             <div class="add-button" @click="isShowAdd = true">
-              <div class="add-icon"></div>
-              新增优惠
+              <div class="add-icon"></div>新增优惠
             </div>
           </div>
         </div>
@@ -95,24 +74,21 @@
           <!-- <span>暂无优惠信息</span> -->
           <li class="offer-item">
             <div class="offer-name">
-              <div class="icon"></div>
-              全店满500减50
+              <div class="icon"></div>全店满500减50
             </div>
             <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
             <div class="offer-time">活动地址:工农路一柱楼前台</div>
           </li>
           <li class="offer-item">
             <div class="offer-name">
-              <div class="icon"></div>
-              全店满500减50
+              <div class="icon"></div>全店满500减50
             </div>
             <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
             <div class="offer-time">活动地址:工农路一柱楼前台</div>
           </li>
           <li class="offer-item">
             <div class="offer-name">
-              <div class="icon"></div>
-              全店满500减50
+              <div class="icon"></div>全店满500减50
             </div>
             <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
             <div class="offer-time">活动地址:工农路一柱楼前台</div>
@@ -125,18 +101,12 @@
       </div>
       <div class="bottom" v-if="isClaimed && canEdit">
         <div class="cancel"></div>
-        <div class="save-button"></div>
+        <div class="save-button" @click="saveConfirm"></div>
       </div>
-      <div
-        class="claim-button"
-        v-if="!isClaimed"
-        @click="isShowClaim = true"
-      ></div>
+      <div class="claim-button" v-if="!isClaimed" @click="isShowClaim = true"></div>
       <van-popup v-model="isShowClaim" round>
         <div class="commit-affirm">
-          <div class="text">
-            请确认这是您的企业后再进行提交哦～ 是否确认提交？
-          </div>
+          <div class="text">请确认这是您的企业后再进行提交哦～ 是否确认提交？</div>
           <div class="buttons">
             <div class="canncel" @click="isShowClaim = false">再想想</div>
             <div class="confirm" @click="comfirmCommit">确认提交</div>
@@ -144,14 +114,26 @@
         </div>
       </van-popup>
     </div>
-    <div class="date-time" v-if="isShowCreateDate">
+    <div class="date-time" v-if="isShowStartTime">
       <van-datetime-picker
-        v-model="enterpriseDate"
-        type="date"
-        :min-date="minDate"
-        :max-date="maxDate"
-        @confirm="confirmCreateDate"
-        @cancel="canncelCreateDate"
+        v-model="currentTime1"
+        type="time"
+        title="选择时间"
+        :min-hour="0"
+        :max-hour="24"
+        @confirm="confirmStart"
+        @cancel="isShowStartTime = false"
+      />
+    </div>
+    <div class="date-time" v-if="isShowEndTime">
+      <van-datetime-picker
+        v-model="currentTime2"
+        type="time"
+        title="选择时间"
+        :min-hour="0"
+        :max-hour="24"
+        @confirm="confirmEnd"
+        @cancel="isShowEndTime = false"
       />
     </div>
     <van-dialog v-model="isShowAdd" title="新增优惠" show-cancel-button>
@@ -201,9 +183,14 @@ export default {
       minDate: new Date(2000, 1, 1),
       maxDate: new Date(2055, 1, 1),
       enterpriseDate: new Date(),
-      isShowCreateDate: false,
+      isShowStartTime: false,
+      isShowEndTime: false,
       isShowClaim: false,
       canEdit: false,
+      startTime: "",
+      endTime: "",
+      currentTime1: "",
+      currentTime2: "",
       isClaimed: false,
       isShowAdd: false,
       specialTitle: "",
@@ -229,6 +216,9 @@ export default {
           vm.createTime = resp.data.data.companyOffers.createTime;
           vm.enterpriseAddress = resp.data.data.address;
           vm.enterpriseExplain = resp.data.data.description;
+          if (resp.data.data.claimStatus) {
+            vm.isClaimed = true;
+          }
         });
     },
     blur() {
@@ -243,25 +233,40 @@ export default {
       this.show = false;
       this.date = `${this.toDate(start)} - ${this.toDate(end)}`;
     },
-    confirmCreateDate(date) {
-      this.createTime = this.toDate(date);
-      this.isShowCreateDate = false;
-    },
-    canncelCreateDate() {
-      this.isShowCreateDate = false;
-    },
-    showCreateDate() {
+    showStartTime() {
       if (!this.canEdit) {
         return;
       }
-      this.isShowCreateDate = true;
+      this.isShowStartTime = true;
+    },
+    showEndTime() {
+      if (!this.canEdit) {
+        return;
+      }
+      this.isShowEndTime = true;
     },
     afterRead(file) {
       console.log(file);
     },
     comfirmCommit() {
+      let vm = this;
+      http
+        .post(api.CLAIMCOMPANY, {
+          companyID: vm.$route.query.companyID
+        })
+        .then(resp => {
+          console.log(resp);
+        });
       this.isClaimed = true;
       this.isShowClaim = false;
+    },
+    confirmStart(value) {
+      this.startTime = value;
+      this.isShowStartTime = false;
+    },
+    confirmEnd(value) {
+      this.endTime = value;
+      this.isShowEndTime = false;
     },
     edit() {
       if (!this.isClaimed) {
@@ -274,6 +279,15 @@ export default {
       this.$router.push({
         path: "/enterpriseMap"
       });
+    },
+    saveConfirm() {
+      let formData = new FormData();
+      let files = [];
+      this.fileList.map(v => {
+        files.push(v.file);
+      });
+      formData.append("file", files);
+      http.upload(api.COMPANYINFOMODIFY, formData);
     }
   },
   components: {
@@ -363,6 +377,14 @@ export default {
             color: #728096;
             font-family: "FZSong";
             font-size: 16px;
+          }
+          .start,
+          .end {
+            float: right;
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
           }
         }
       }
@@ -502,7 +524,7 @@ export default {
     }
     .bottom {
       width: 100%;
-      height: 40px;
+      // height: 40px;
       padding-top: 30px;
       display: flex;
       align-items: center;
@@ -536,7 +558,7 @@ export default {
     }
     .commit-affirm {
       width: 260px;
-      height: 90px;
+      height: 108px;
       font-weight: 500;
       font-size: 16px;
       .text {
@@ -544,6 +566,7 @@ export default {
         padding: 0 15px;
         font-family: "FZSong";
         text-align: center;
+        line-height: 25px;
         font-size: 13px;
       }
       .buttons {

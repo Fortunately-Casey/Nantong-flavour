@@ -12,6 +12,7 @@
             :title="v.companyName"
             v-for="(v, i) in item.items"
             :key="i"
+            @click="goToEnterprise(v)"
           />
         </div>
       </van-index-bar>
@@ -22,6 +23,8 @@
 <script>
 import * as api from "@/service/apiList";
 import http from "@/service/service";
+// import { EventBus } from "@/common/eventBus.js";
+import { Indicator } from "mint-ui";
 export default {
   data() {
     return {
@@ -35,7 +38,9 @@ export default {
   methods: {
     getCompanyList() {
       let vm = this;
+      Indicator.open();
       http.get(api.COMPANYLIST, {}, vm).then(resp => {
+        Indicator.close();
         let res = resp.data.data;
         let arr = [];
         for (var k in res) {
@@ -47,6 +52,15 @@ export default {
         }
         console.log(arr);
         vm.barList = arr;
+      });
+    },
+    goToEnterprise(v) {
+      // EventBus.$emit("chosedEnterprise", v);
+      this.$router.push({
+        path: "/enterpriseMap",
+        query: {
+          companyID: v.companyID
+        }
       });
     },
     goback() {

@@ -2,7 +2,7 @@
   <div class="enterprise-map">
     <div class="top">
       <div class="search-icon"></div>
-      <input type="text" placeholder="输入企业名称搜索" />
+      <input type="text" placeholder="输入企业名称搜索" v-model="companyName" />
       <div class="enterprise-button" @click="goToEnterpriseList">企业列表</div>
     </div>
     <div id="map">
@@ -11,10 +11,9 @@
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
         <div class="box"></div>
-        <div class="text">
-          {{ isShowEntry ? "该企业尚未有人认领" : "该企业已被认领" }}
-        </div>
+        <div class="text">{{ isShowEntry ? "该企业尚未有人认领" : "该企业已被认领" }}</div>
         <div class="entry-button" @click="goToClaim" v-if="isShowEntry"></div>
+        <div class="entry-button" @click="goToClaim" v-if="isShowGetEntry"></div>
       </div>
     </van-action-sheet>
   </div>
@@ -26,19 +25,54 @@ import { Indicator } from "mint-ui";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
 import { Notify } from "vant";
+import { EventBus } from "@/common/eventBus.js";
+import { debounce } from "@/common/tool/tool";
 export default {
   data() {
     return {
+      companyName: "",
       isShowEnterprise: false,
       enterpriseName: "",
       location: {},
       map: {},
       isShowEntry: false,
-      id: ""
+      isShowGetEntry: false,
+      id: "",
+      isWatchCompanyName: true
     };
   },
-  created() {},
+  created() {
+    let vm = this;
+    vm.$watch(
+      "companyName",
+      debounce((newValue, oldValue) => {
+        if (!vm.isWatchCompanyName) {
+          return;
+        }
+        http
+          .get(
+            api.COMPANYLIST,
+            {
+              companyName: vm.companyName
+            },
+            vm
+          )
+          .then(resp => {
+            // Indicator.close();
+            let res = resp.data.data;
+            // console.log(res);
+            let arr = [];
+            for (var k in res) {
+              arr.concat(res[k]);
+            }
+            console.log(arr);
+            // vm.barList = arr;
+          });
+      })
+    );
+  },
   mounted() {
+    let vm = this;
     Indicator.open();
     // setTimeout(() => {
     // this.getLocation();
@@ -134,7 +168,53 @@ export default {
               wkid: 4490
             }
           });
-          vm.map.centerAndZoom(point, 16);
+          // console.log(111)
+          if (vm.$route.query.companyID) {
+            http
+              .get(api.COMPANYINFO, {
+                companyID: vm.$route.query.companyID
+              })
+              .then(resp => {
+                Indicator.close();
+                if (resp.data.data) {
+                  vm.enterpriseName = resp.data.data.companyName;
+                  vm.id = resp.data.data.companyID;
+                  console.log(resp.data.data);
+                  let point1 = new Point({
+                    x: resp.data.data.longitude,
+                    y: resp.data.data.latitude,
+                    spatialReference: {
+                      wkid: 4490
+                    }
+                  });
+                  vm.map.centerAndZoom(point1, 18);
+                  vm.isShowEnterprise = true;
+                  // if (!resp.data.data.claimStatus) {
+                  //   vm.isShowEntry = true;
+                  // } else if (resp.data.data.myClaimStatus) {
+                  //   vm.isShowEntry = true;
+                  // } else {
+                  //   vm.isShowEntry = false;
+                  // }
+                }
+              });
+          } else {
+            vm.map.centerAndZoom(point, 16);
+          }
+          // if (!vm.chosedEnterprise) {
+          //   vm.map.centerAndZoom(point, 16);
+          // } else {
+          //   let point1 = new Point({
+          //     x: vm.chosedEnterprise.longitude,
+          //     y: vm.chosedEnterprise.latitude,
+          //     spatialReference: {
+          //       wkid: 4490
+          //     }
+          //   });
+          //   console.log("1111");
+          //   vm.map.centerAndZoom(point1, 16);
+          // }
+          // vm.map.centerAndZoom(point, 16);
           var startPointSymbol = new SimpleMarkerSymbol();
           startPointSymbol.style = SimpleMarkerSymbol.STYLE_CIRCLE;
           startPointSymbol.setSize(10);
@@ -175,6 +255,11 @@ export default {
                       vm.isShowEntry = true;
                     } else {
                       vm.isShowEntry = false;
+                    }
+                    if (resp.data.data.myClaimStatus) {
+                      vm.isShowGetEntry = true;
+                    } else {
+                      vm.isShowGetEntry = false;
                     }
                   }
                   console.log(resp.data.data);

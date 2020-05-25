@@ -1,30 +1,42 @@
 <template>
   <div class="enterprise-claim">
     <div class="top">
-      <div class="back" @click="back">
-        <van-icon name="arrow-left" />返回
-      </div>企业认领
-      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">编辑</div>
+      <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
+      企业认领
+      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">
+        编辑
+      </div>
     </div>
     <div class="content">
       <div class="enterprise-info">
         <div class="item">
           <div class="name">企业名称</div>
           <div class="value">
-            <input type="text" @blur="blur" v-model="enterpriseName" :disabled="!canEdit" />
+            <input
+              type="text"
+              @blur="blur"
+              v-model="enterpriseName"
+              :disabled="!canEdit"
+            />
           </div>
         </div>
         <div class="item">
           <div class="name">企业电话</div>
           <div class="value">
-            <input type="text" @blur="blur" v-model="phoneNumber" :disabled="!canEdit" />
+            <input
+              type="text"
+              @blur="blur"
+              v-model="phoneNumber"
+              :disabled="!canEdit"
+            />
           </div>
         </div>
         <div class="item">
           <div class="name">营业时间</div>
           <div class="value">
             <!-- {{ startTime }} -->
-            <div class="start" @click="showStartTime">{{ startTime }}</div>-
+            <div class="start" @click="showStartTime">{{ startTime }}</div>
+            -
             <div class="end" @click="showEndTime">{{ endTime }}</div>
           </div>
         </div>
@@ -50,21 +62,33 @@
           <div class="name">企业说明</div>
         </div>
         <div class="text-area">
-          <textarea name id maxlength="50" v-model="enterpriseExplain" :disabled="!canEdit"></textarea>
+          <textarea
+            name
+            id
+            maxlength="50"
+            v-model="enterpriseExplain"
+            :disabled="!canEdit"
+          ></textarea>
         </div>
       </div>
       <div class="enterprise-photo">
         <div class="left">企业照片</div>
         <div class="right">
-          <van-uploader v-model="fileList" multiple :after-read="afterRead" max-count="2" />
+          <van-uploader
+            v-model="fileList"
+            multiple
+            :after-read="afterRead"
+            max-count="2"
+          />
         </div>
       </div>
       <div class="special-offers">
         <div class="item">
           <div class="name">优惠信息</div>
           <div class="value">
-            <div class="add-button" @click="isShowAdd = true">
-              <div class="add-icon"></div>新增优惠
+            <div class="add-button" @click="add">
+              <div class="add-icon"></div>
+              新增优惠
             </div>
           </div>
         </div>
@@ -72,26 +96,19 @@
       <scroll class="wrapper">
         <ul class="offers-list">
           <!-- <span>暂无优惠信息</span> -->
-          <li class="offer-item">
+          <li
+            class="offer-item"
+            v-for="(item, index) in companyOffers"
+            :key="index"
+          >
             <div class="offer-name">
-              <div class="icon"></div>全店满500减50
+              <div class="icon"></div>
+              {{ item.offerTitle }}
             </div>
-            <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
-            <div class="offer-time">活动地址:工农路一柱楼前台</div>
-          </li>
-          <li class="offer-item">
-            <div class="offer-name">
-              <div class="icon"></div>全店满500减50
+            <div class="offer-address">
+              活动时间:{{ item.offerStartTime + "-" + item.offerEndTime }}
             </div>
-            <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
-            <div class="offer-time">活动地址:工农路一柱楼前台</div>
-          </li>
-          <li class="offer-item">
-            <div class="offer-name">
-              <div class="icon"></div>全店满500减50
-            </div>
-            <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
-            <div class="offer-time">活动地址:工农路一柱楼前台</div>
+            <div class="offer-time">活动描述:{{ item.offerDescription }}</div>
           </li>
         </ul>
       </scroll>
@@ -103,10 +120,16 @@
         <div class="cancel"></div>
         <div class="save-button" @click="saveConfirm"></div>
       </div>
-      <div class="claim-button" v-if="!isClaimed" @click="isShowClaim = true"></div>
+      <div
+        class="claim-button"
+        v-if="!isClaimed"
+        @click="isShowClaim = true"
+      ></div>
       <van-popup v-model="isShowClaim" round>
         <div class="commit-affirm">
-          <div class="text">请确认这是您的企业后再进行提交哦～ 是否确认提交？</div>
+          <div class="text">
+            请确认这是您的企业后再进行提交哦～ 是否确认提交？
+          </div>
           <div class="buttons">
             <div class="canncel" @click="isShowClaim = false">再想想</div>
             <div class="confirm" @click="comfirmCommit">确认提交</div>
@@ -136,9 +159,14 @@
         @cancel="isShowEndTime = false"
       />
     </div>
-    <van-dialog v-model="isShowAdd" title="新增优惠" show-cancel-button>
+    <van-dialog
+      v-model="isShowAdd"
+      title="新增优惠"
+      show-cancel-button
+      @confirm="addConfirm"
+    >
       <van-field
-        v-model="specialTitle"
+        v-model="offerTitle"
         name="优惠标题"
         label="优惠标题"
         placeholder="请输入优惠标题"
@@ -154,11 +182,11 @@
         @click="show = true"
       />
       <van-field
-        v-model="specialAddress"
-        name="优惠地址"
-        label="优惠地址"
-        placeholder="请输入优惠地址"
-        :rules="[{ required: true, message: '请填写优惠地址' }]"
+        v-model="offerDescription"
+        name="活动描述"
+        label="活动描述"
+        placeholder="请输入活动描述"
+        :rules="[{ required: true, message: '请填写活动描述' }]"
       />
     </van-dialog>
     <van-calendar v-model="show" type="range" @confirm="onConfirm" />
@@ -171,6 +199,7 @@ import { Toast } from "vant";
 import Scroll from "@/components/Scroll";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
+import { Indicator } from "mint-ui";
 export default {
   data() {
     return {
@@ -193,10 +222,11 @@ export default {
       currentTime2: "",
       isClaimed: false,
       isShowAdd: false,
-      specialTitle: "",
-      specialAddress: "",
+      offerTitle: "",
+      offerDescription: "",
       date: "",
-      show: false
+      show: false,
+      companyOffers: []
     };
   },
   created() {
@@ -205,12 +235,13 @@ export default {
   methods: {
     getDetail() {
       let vm = this;
+      Indicator.open();
       http
         .get(api.COMPANYINFO, {
           companyID: this.$route.query.companyID
         })
         .then(resp => {
-          console.log(resp.data.data);
+          Indicator.close();
           vm.enterpriseName = resp.data.data.companyName;
           vm.phoneNumber = resp.data.data.linkPhone;
           vm.createTime = resp.data.data.companyOffers.createTime;
@@ -219,6 +250,15 @@ export default {
           if (resp.data.data.claimStatus) {
             vm.isClaimed = true;
           }
+          vm.startTime = resp.data.data.businessHours.split("-")[0];
+          vm.endTime = resp.data.data.businessHours.split("-")[1];
+          vm.companyOffers = resp.data.data.companyOffers;
+          let pictures = resp.data.data.corporatePictures.split(";");
+          pictures.map(v => {
+            vm.fileList.push({
+              url: v
+            });
+          });
         });
     },
     blur() {
@@ -227,11 +267,33 @@ export default {
     toDate(date) {
       return Todate(date);
     },
+    addConfirm() {
+      let vm = this;
+      this.companyOffers.push({
+        companyID: vm.$route.query.companyID,
+        offerTitle: vm.offerTitle,
+        offerStartTime: vm.date.split("~")[0],
+        offerEndTime: vm.date.split("~")[1],
+        offerDescription: vm.offerDescription
+      });
+    },
+    // addNewoffer1() {
+    //   this.isShowAdd = true;
+    //   this.offerTitle = "";
+    //   this.date = "";
+    //   this.offerDescription = "";
+    // },
+    add() {
+      this.isShowAdd = true;
+      this.offerTitle = "";
+      this.date = "";
+      this.offerDescription = "";
+    },
     onConfirm(date) {
-      console.log(date);
+      // console.log(date);
       const [start, end] = date;
       this.show = false;
-      this.date = `${this.toDate(start)} - ${this.toDate(end)}`;
+      this.date = `${this.toDate(start)} ~ ${this.toDate(end)}`;
     },
     showStartTime() {
       if (!this.canEdit) {
@@ -281,13 +343,34 @@ export default {
       });
     },
     saveConfirm() {
+      let vm = this;
       let formData = new FormData();
-      let files = [];
+      // let files = [];
+      // console.log(this.fileList);
       this.fileList.map(v => {
-        files.push(v.file);
+        // if (v.url) {
+        //   formData.append("corporatePictures", v.url);
+        // }
+        //  else {
+        //   formData.append("file", v.file);
+        // }
+        formData.append("file", v.file);
       });
-      formData.append("file", files);
-      http.upload(api.COMPANYINFOMODIFY, formData);
+      // JSON.stringify(vm.companyOffers);
+
+      formData.append("companyID", vm.$route.query.companyID);
+      formData.append("companyName", vm.enterpriseName);
+      formData.append("linkPhone", vm.phoneNumber);
+      formData.append("address", vm.enterpriseAddress);
+      formData.append("businessHours", `${vm.startTime}-${vm.endTime}`);
+      formData.append("description", vm.enterpriseExplain);
+      // formData.append("companyOffers", vm.companyOffers);
+      formData.append("jsonStr", JSON.stringify(vm.companyOffers));
+      // console.log(vm.companyOffers.join(','));
+      // console.log(formData.get('companyOffers'))
+      http.upload(api.COMPANYINFOMODIFY, formData, vm).then(resp => {
+        console.log(resp);
+      });
     }
   },
   components: {

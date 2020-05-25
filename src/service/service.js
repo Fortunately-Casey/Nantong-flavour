@@ -32,7 +32,7 @@ http.upload = function(apiUrl, params, vue) {
   return axios
     .post(url, params, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
         token: token
       }
     })

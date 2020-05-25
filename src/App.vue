@@ -1,7 +1,7 @@
 /* eslint-disable no-irregular-whitespace */
 <template>
   <div id="app">
-    <router-view />
+      <router-view />
   </div>
 </template>
 

@@ -533,19 +533,21 @@ export default {
       transform: translateY(-50%);
     }
     .search-list {
-      width: 250px;
+      width: 75%;
       height: 150px;
       border: 1px solid #eee;
+      border-radius: 5px;
       position: absolute;
       left: 10px;
       top: 42px;
       z-index: 999;
-      background-color: #fff;
+      background-color: rgba(255, 255, 255, 0.8);
       .search-item {
         padding-left: 20px;
         height: 35px;
         line-height: 35px;
-        color: #000;
+        font-family: "FZSong";
+        color: #975b16;
       }
     }
     .enterprise-button {

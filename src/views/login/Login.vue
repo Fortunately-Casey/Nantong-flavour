@@ -166,7 +166,7 @@ export default {
   .logo-top {
     width: 320px;
     height: 306px;
-    background: url("../../assets/image/nantong-bg.png") no-repeat;
+    background: url("../../assets/image/nantong-bg1.png") no-repeat;
     background-size: 100% 100%;
     margin: 0 auto;
     background-position: 0px 15px;

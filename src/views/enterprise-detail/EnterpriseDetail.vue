@@ -1,5 +1,8 @@
 <template>
-  <div class="enterprise-detail" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
+  <div
+    class="enterprise-detail"
+    :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }"
+  >
     <div class="top">
       <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
       企业详情
@@ -8,18 +11,20 @@
       <div class="name">{{ enterpriseName }}</div>
       <div class="image-content">
         <div class="name">企业图片</div>
-        <div class="image-list">
-          <van-image
-            width="120"
-            height="80"
-            :src="item.url"
-            alt
-            v-for="(item, index) in fileList"
-            :key="index"
-            @click="showImage"
-            fit="contain"
-          />
-        </div>
+        <scroll class="wrapper1">
+          <div class="image-list">
+            <van-image
+              width="120"
+              height="80"
+              :src="item.url"
+              alt
+              v-for="(item, index) in fileList"
+              :key="index"
+              @click="showImage"
+              fit="contain"
+            />
+          </div>
+        </scroll>
       </div>
       <div class="address-content">
         <div class="left">
@@ -31,10 +36,14 @@
             <div class="icon"></div>
             营业时间：{{ businessHours }}
           </div>
+          <div class="linkphone">
+            <div class="icon"></div>
+            联系电话：{{ linkPhone }}
+          </div>
         </div>
-        <div class="right">
+        <!-- <div class="right">
           <div class="phone-icon" @click="showPhone"></div>
-        </div>
+        </div>-->
       </div>
       <div class="enterprise-info">
         <div class="info">
@@ -88,21 +97,21 @@ export default {
       description: "",
       fileList: [],
       companyOffers: [],
-      bodyHeight:""
+      bodyHeight: ""
     };
   },
   created() {
     this.getDetail();
   },
   mounted() {
-     this.bodyHeight = document.documentElement.clientHeight;
+    this.bodyHeight = document.documentElement.clientHeight;
   },
   methods: {
     getDetail() {
       let vm = this;
       Indicator.open();
       http
-        .get(api.COMPANYINFO, {
+        .get(api.COMPANYINFOBYTEMP, {
           companyID: this.$route.query.companyID
         })
         .then(resp => {
@@ -235,17 +244,23 @@ export default {
         font-size: 14px;
         border: none;
       }
-      .image-list {
-        img {
-          width: 120px;
-          height: 80px;
-          border-radius: 4px;
-          margin-right: 10px;
+      .wrapper1 {
+        width: 100%;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        .image-list {
+          width: 1000px;
+          img {
+            width: 120px;
+            height: 80px;
+            border-radius: 4px;
+            margin-right: 10px;
+          }
         }
       }
     }
     .address-content {
-      height: 88px;
+      height: 132px;
       background-color: #fff;
       border-bottom: 1px solid #ecf1f7;
       margin-top: 15px;
@@ -273,12 +288,14 @@ export default {
             transform: translateY(-50%);
           }
         }
-        .open-time {
+        .open-time,
+        .linkphone {
           flex: 1;
           line-height: 44px;
           font-family: "FZSong";
           padding-left: 20px;
           position: relative;
+          border-bottom: 1px solid #ecf1f7;
           .icon {
             width: 14px;
             height: 16px;
@@ -288,6 +305,14 @@ export default {
             left: 0;
             top: 50%;
             transform: translateY(-50%);
+          }
+        }
+        .linkphone {
+          .icon {
+            width: 15px;
+            height: 15px;
+            background: url("../../assets/image/phone-icon.png") no-repeat;
+            background-size: 100% 100%;
           }
         }
       }
@@ -340,6 +365,7 @@ export default {
       background-color: #fff;
       margin-top: 15px;
       padding: 0 16px;
+      padding-bottom: 20px;
       .info {
         border-bottom: 1px solid #ecf1f7;
         line-height: 44px;
@@ -360,6 +386,7 @@ export default {
       .wrapper {
         width: 100%;
         overflow: hidden;
+        -webkit-overflow-scrolling: touch;
         .offers-list {
           width: 770px;
           min-height: 68px;

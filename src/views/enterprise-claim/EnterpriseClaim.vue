@@ -76,15 +76,17 @@
       </div>
       <div class="enterprise-photo">
         <div class="left">企业照片</div>
-        <div class="right">
-          <van-uploader
-            v-model="fileList"
-            multiple
-            :after-read="afterRead"
-            max-count="2"
-            :disabled="!canEdit"
-          />
-        </div>
+        <scroll class="wrapper1">
+          <div class="right">
+            <van-uploader
+              v-model="fileList"
+              multiple
+              :after-read="afterRead"
+              max-count="8"
+              :disabled="!canEdit"
+            />
+          </div>
+        </scroll>
       </div>
       <div class="special-offers">
         <div class="item">
@@ -364,7 +366,7 @@ export default {
                 this.isClaimed = false;
                 Notify({ type: "success", message: "取消成功" });
               } else {
-                Notify({ type: "warning", message: "取消失败" });
+                Notify({ type: "warning", message: resp.data.message });
               }
               vm.getDetail();
             });
@@ -387,7 +389,7 @@ export default {
             if (resp.data.success) {
               Notify({ type: "success", message: "打卡成功" });
             } else {
-              Notify({ type: "warning", message: "打卡失败" });
+              Notify({ type: "warning", message: resp.data.message });
             }
             vm.getDetail();
           });
@@ -411,7 +413,7 @@ export default {
             Notify({ type: "success", message: "认领成功" });
             vm.getDetail();
           } else {
-            Notify({ type: "warning", message: "认领失败" });
+            Notify({ type: "warning", message: resp.data.message });
           }
         });
     },
@@ -436,43 +438,48 @@ export default {
       });
     },
     cancel() {
-      vm.getDetail();
+      this.getDetail();
     },
     saveConfirm() {
       let vm = this;
-      Indicator.open();
-      let formData = new FormData();
-      // let files = [];
-      // console.log(this.fileList);
-      let arr = [];
-      this.fileList.map(v => {
-        if (!v.url) {
-          formData.append("file", v.file);
-        }
-        if (v.url) {
-          arr.push(v.url);
-        }
-      });
-      formData.append("corporatePictures", arr.join(";"));
-      formData.append("companyID", vm.$route.query.companyID);
-      formData.append("companyName", vm.enterpriseName);
-      formData.append("linkPhone", vm.phoneNumber);
-      formData.append("address", vm.enterpriseAddress);
-      formData.append("businessHours", `${vm.startTime}-${vm.endTime}`);
-      formData.append("description", vm.enterpriseExplain);
-      // formData.append("companyOffers", vm.companyOffers);
-      formData.append("jsonStr", JSON.stringify(vm.companyOffers));
-      // console.log(vm.companyOffers.join(','));
-      // console.log(formData.get('companyOffers'))
-      http.upload(api.COMPANYINFOMODIFY, formData, vm).then(resp => {
-        Indicator.close();
-        if (resp.data.success) {
-          this.isClaimed = false;
-          Notify({ type: "success", message: "修改成功" });
-          vm.getDetail();
-        } else {
-          Notify({ type: "warning", message: "取消失败" });
-        }
+      Dialog.confirm({
+        title: "保存更改",
+        message: "确认要保存改企业信息吗？"
+      }).then(() => {
+        Indicator.open();
+        let formData = new FormData();
+        // let files = [];
+        // console.log(this.fileList);
+        let arr = [];
+        this.fileList.map(v => {
+          if (!v.url) {
+            formData.append("file", v.file);
+          }
+          if (v.url) {
+            arr.push(v.url);
+          }
+        });
+        formData.append("corporatePictures", arr.join(";"));
+        formData.append("companyID", vm.$route.query.companyID);
+        formData.append("companyName", vm.enterpriseName);
+        formData.append("linkPhone", vm.phoneNumber);
+        formData.append("address", vm.enterpriseAddress);
+        formData.append("businessHours", `${vm.startTime}-${vm.endTime}`);
+        formData.append("description", vm.enterpriseExplain);
+        // formData.append("companyOffers", vm.companyOffers);
+        formData.append("jsonStr", JSON.stringify(vm.companyOffers));
+        // console.log(vm.companyOffers.join(','));
+        // console.log(formData.get('companyOffers'))
+        http.upload(api.COMPANYINFOMODIFY, formData, vm).then(resp => {
+          Indicator.close();
+          if (resp.data.success) {
+            this.isClaimed = false;
+            Notify({ type: "success", message: "修改成功" });
+            vm.getDetail();
+          } else {
+            Notify({ type: "warning", message: "取消失败" });
+          }
+        });
       });
     }
   },
@@ -569,8 +576,11 @@ export default {
             float: right;
             width: 50px;
             height: 40px;
+            color: #728096;
+            font-family: "FZSong";
             text-align: center;
             line-height: 40px;
+            font-size: 16px;
           }
         }
       }
@@ -638,23 +648,30 @@ export default {
       padding: 0 16px;
       display: flex;
       .left {
-        width: 70px;
+        width: 100px;
         font-family: "FZSong";
         font-size: 16px;
         text-align: center;
         line-height: 100px;
         margin-right: 15px;
       }
-      .right {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding-top: 10px;
+      .wrapper1 {
+        width: 100%;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        .right {
+          // flex: 1;
+          width: 800px;
+          display: flex;
+          align-items: center;
+          padding-top: 10px;
+        }
       }
     }
     .wrapper {
       width: 100%;
       overflow: hidden;
+      -webkit-overflow-scrolling: touch;
       .offers-list {
         width: 770px;
         min-height: 68px;
@@ -693,6 +710,7 @@ export default {
               height: 16px;
               background: url("../../assets/image/gift.png") no-repeat;
               background-size: 100% 100%;
+              margin-right: 8px;
             }
           }
           .offer-address,
@@ -720,6 +738,7 @@ export default {
       width: 100%;
       // height: 40px;
       padding-top: 30px;
+      padding-bottom: 30px;
       display: flex;
       align-items: center;
       justify-content: center;

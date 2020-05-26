@@ -1,6 +1,7 @@
 export const REGISTERED = "/shop/register"; //注册
 export const Login = "/shop/login"; //登录
 export const COMPANYINFO = "/shop/companyInfo"; //获取公司详情
+export const COMPANYINFOBYTEMP = "/shop/companyInfoByTemp"; //游客获取公司详情
 export const CLAIMCOMPANY = "/shop/claimCompany"; //店铺认领
 export const UNCLAIMCOMPANY = "/shop/unClaim"; //取消认领
 export const PUNCHIN = "/shop/punchIn"; //企业打卡

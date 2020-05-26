@@ -25,7 +25,8 @@ module.exports = {
     proxy: {
       "/api": {
         /* 目标代理服务器地址 */
-        target: "http://223.113.1.77:10058",
+        // target: "http://223.113.1.77:10058",
+        target: "http://192.168.1.214:10058",
         // target: "http://xuyanantong.qicp.vip/",
         // target: "http://192.168.3.94:10058",
         pathRewrite: {

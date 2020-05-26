@@ -91,14 +91,14 @@ export default {
     this.bodyHeight = document.documentElement.clientHeight;
     let vm = this;
     Indicator.open();
-    // setTimeout(() => {
-    //   this.getLocation();
-    // }, 2000);
+    setTimeout(() => {
+      this.getLocation();
+    }, 2000);
     // setTimeout(() => {
     //   this.createMap();
     // });
     // this.$nextTick(function() {
-    this.createMap();
+    // this.createMap();
     // });
   },
   methods: {
@@ -171,24 +171,24 @@ export default {
           );
           vm.map.addLayer(dynamicLayer);
           vm.map.addLayer(dynamicLayer1);
-          // let point = new Point({
-          //   x: Number(vm.location.longitude),
-          //   y: Number(vm.location.latitude),
-          //   spatialReference: {
-          //     wkid: 4490
-          //   }
-          // });
           let point = new Point({
-            x: 120.86448335647579,
-            y: 32.00571294529357,
+            x: Number(vm.location.longitude),
+            y: Number(vm.location.latitude),
             spatialReference: {
               wkid: 4490
             }
           });
+          // let point = new Point({
+          //   x: 120.86448335647579,
+          //   y: 32.00571294529357,
+          //   spatialReference: {
+          //     wkid: 4490
+          //   }
+          // });
           // console.log(111)
           if (vm.$route.query.companyID) {
             http
-              .get(api.COMPANYINFO, {
+              .get(api.COMPANYINFOBYTEMP, {
                 companyID: vm.$route.query.companyID
               })
               .then(resp => {
@@ -205,16 +205,16 @@ export default {
                   });
                   vm.map.centerAndZoom(point1, 18);
                   vm.isShowEnterprise = true;
-                  if (!resp.data.data.claimStatus && resp.data.data !== 0) {
-                    vm.isShowEntry = true;
-                  } else {
-                    vm.isShowEntry = false;
-                  }
-                  if (resp.data.data.myClaimStatus) {
-                    vm.isShowGetEntry = true;
-                  } else {
-                    vm.isShowGetEntry = false;
-                  }
+                  // if (!resp.data.data.claimStatus && resp.data.data !== 0) {
+                  //   vm.isShowEntry = true;
+                  // } else {
+                  //   vm.isShowEntry = false;
+                  // }
+                  // if (resp.data.data.myClaimStatus) {
+                  //   vm.isShowGetEntry = true;
+                  // } else {
+                  //   vm.isShowGetEntry = false;
+                  // }
                 }
               });
           } else {

@@ -1,27 +1,35 @@
 <template>
-  <div class="enterprise-detail">
+  <div class="enterprise-detail" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
     <div class="top">
       <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
       企业详情
     </div>
     <div class="content">
-      <div class="name">一柱楼食品有限公司</div>
+      <div class="name">{{ enterpriseName }}</div>
       <div class="image-content">
         <div class="name">企业图片</div>
         <div class="image-list">
-          <img src="../../assets/image/box.png" alt />
-          <img src="../../assets/image/box.png" alt />
+          <van-image
+            width="120"
+            height="80"
+            :src="item.url"
+            alt
+            v-for="(item, index) in fileList"
+            :key="index"
+            @click="showImage"
+            fit="contain"
+          />
         </div>
       </div>
       <div class="address-content">
         <div class="left">
           <div class="address">
             <div class="icon"></div>
-            江苏省南通市崇川区工农路172号
+            {{ address }}
           </div>
           <div class="open-time">
             <div class="icon"></div>
-            营业时间：9:00-23:00
+            营业时间：{{ businessHours }}
           </div>
         </div>
         <div class="right">
@@ -33,9 +41,7 @@
           <div class="icon"></div>
           企业说明
         </div>
-        <div class="info-text">
-          由各种物质组成的巨型球状天体，叫做星球。由各种物质组成的巨型球状天体，叫做星球。
-        </div>
+        <div class="info-text">{{ description }}</div>
       </div>
       <div class="discounts-info">
         <div class="info">
@@ -44,30 +50,19 @@
         </div>
         <scroll class="wrapper">
           <ul class="offers-list">
-            <!-- <span>暂无优惠信息</span> -->
-            <li class="offer-item">
+            <li
+              class="offer-item"
+              v-for="(item, index) in companyOffers"
+              :key="index"
+            >
               <div class="offer-name">
                 <div class="icon"></div>
-                全店满500减50
+                {{ item.offerTitle }}
               </div>
-              <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
-              <div class="offer-time">活动地址:工农路一柱楼前台</div>
-            </li>
-            <li class="offer-item">
-              <div class="offer-name">
-                <div class="icon"></div>
-                全店满500减50
+              <div class="offer-address">
+                活动时间:{{ item.offerStartTime + "-" + item.offerEndTime }}
               </div>
-              <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
-              <div class="offer-time">活动地址:工农路一柱楼前台</div>
-            </li>
-            <li class="offer-item">
-              <div class="offer-name">
-                <div class="icon"></div>
-                全店满500减50
-              </div>
-              <div class="offer-address">活动时间:2020-05-20-2020-05-30</div>
-              <div class="offer-time">活动地址:工农路一柱楼前台</div>
+              <div class="offer-time">活动描述:{{ item.offerDescription }}</div>
             </li>
           </ul>
         </scroll>
@@ -77,19 +72,88 @@
 </template>
 
 <script>
-import { Toast } from "vant";
+import { Toast, ImagePreview } from "vant";
 import Scroll from "@/components/Scroll";
+import * as api from "@/service/apiList";
+import http from "@/service/service";
+import { Indicator } from "mint-ui";
+import { Image as VanImage } from "vant";
 export default {
   data() {
-    return {};
+    return {
+      enterpriseName: "",
+      address: "",
+      linkPhone: "",
+      businessHours: "",
+      description: "",
+      fileList: [],
+      companyOffers: [],
+      bodyHeight:""
+    };
   },
-  created() {},
+  created() {
+    this.getDetail();
+  },
+  mounted() {
+     this.bodyHeight = document.documentElement.clientHeight;
+  },
   methods: {
+    getDetail() {
+      let vm = this;
+      Indicator.open();
+      http
+        .get(api.COMPANYINFO, {
+          companyID: this.$route.query.companyID
+        })
+        .then(resp => {
+          Indicator.close();
+          vm.enterpriseName = resp.data.data.companyName;
+          vm.linkPhone = resp.data.data.linkPhone;
+          vm.createTime = resp.data.data.companyOffers.createTime;
+          vm.address = resp.data.data.address;
+          vm.enterpriseExplain = resp.data.data.description;
+          if (resp.data.data.claimStatus) {
+            vm.isClaimed = true;
+          }
+          vm.businessHours = resp.data.data.businessHours;
+          vm.description = resp.data.data.description;
+          resp.data.data.companyOffers.map(v => {
+            vm.companyOffers.push({
+              companyID: v.companyID,
+              offerTitle: v.offerTitle,
+              offerStartTime: v.offerStartTime,
+              offerEndTime: v.offerEndTime,
+              offerDescription: v.offerDescription
+            });
+          });
+          if (resp.data.data.corporatePictures) {
+            let pictures = resp.data.data.corporatePictures.split(";");
+            pictures.map(v => {
+              if (v != "") {
+                vm.fileList.push({
+                  url: v
+                });
+              }
+            });
+          }
+        });
+    },
     showPhone() {
       Toast.setDefaultOptions({ duration: 4000 });
-      Toast("0513-84883768");
+      Toast(this.linkPhone);
     },
-    back() {}
+    showImage() {
+      let arr = [];
+      this.fileList.map(v => {
+        arr.push(v.url);
+      });
+      ImagePreview(arr);
+    },
+    back() {
+      this.$router.push({
+        path: "/visitorPage"
+      });
+    }
   },
   components: {
     Scroll
@@ -167,6 +231,7 @@ export default {
         height: 44px;
         line-height: 44px;
         font-family: "FZSong";
+        padding-left: 0;
         font-size: 14px;
         border: none;
       }
@@ -175,7 +240,6 @@ export default {
           width: 120px;
           height: 80px;
           border-radius: 4px;
-          background-color: #000;
           margin-right: 10px;
         }
       }
@@ -297,7 +361,7 @@ export default {
         width: 100%;
         overflow: hidden;
         .offers-list {
-          width: 750px;
+          width: 770px;
           min-height: 68px;
           background-color: #fff;
           overflow: hidden;
@@ -308,11 +372,19 @@ export default {
           }
           .offer-item {
             float: left;
-            width: 247px;
+            width: 255px;
             height: 119px;
             background: url("../../assets/image/offer-bg.png") no-repeat;
             background-size: 100% 100%;
             padding-left: 20px;
+            position: relative;
+            .close-icon {
+              position: absolute;
+              right: 10px;
+              top: 25px;
+              font-size: 18px;
+              color: #fff;
+            }
             .offer-name {
               display: flex;
               align-items: center;

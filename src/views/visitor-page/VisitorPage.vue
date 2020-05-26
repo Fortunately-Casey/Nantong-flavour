@@ -1,5 +1,5 @@
 <template>
-  <div class="visitor">
+  <div class="visitor" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
     <router-view></router-view>
     <div class="bottom-tab">
       <div class="left" @click="choseTab(0)">

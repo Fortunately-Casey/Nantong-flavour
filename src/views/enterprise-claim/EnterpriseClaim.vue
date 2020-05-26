@@ -1,5 +1,8 @@
 <template>
-  <div class="enterprise-claim">
+  <div
+    class="enterprise-claim"
+    :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }"
+  >
     <div class="top">
       <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
       企业认领
@@ -79,6 +82,7 @@
             multiple
             :after-read="afterRead"
             max-count="2"
+            :disabled="!canEdit"
           />
         </div>
       </div>
@@ -101,6 +105,11 @@
             v-for="(item, index) in companyOffers"
             :key="index"
           >
+            <van-icon
+              name="cross"
+              class="close-icon"
+              @click="deleteOffer(index)"
+            />
             <div class="offer-name">
               <div class="icon"></div>
               {{ item.offerTitle }}
@@ -113,11 +122,11 @@
         </ul>
       </scroll>
       <div class="bottom" v-if="isClaimed && !canEdit">
-        <div class="claim-cancel"></div>
-        <div class="punch-button"></div>
+        <div class="claim-cancel" @click="unclaimCompany"></div>
+        <div class="punch-button" @click="punch"></div>
       </div>
       <div class="bottom" v-if="isClaimed && canEdit">
-        <div class="cancel"></div>
+        <div class="cancel" @click="cancel"></div>
         <div class="save-button" @click="saveConfirm"></div>
       </div>
       <div
@@ -194,6 +203,7 @@
 </template>
 
 <script>
+import { Dialog, Notify } from "vant";
 import { blur, Todate } from "@/common/tool/tool.js";
 import { Toast } from "vant";
 import Scroll from "@/components/Scroll";
@@ -226,15 +236,21 @@ export default {
       offerDescription: "",
       date: "",
       show: false,
-      companyOffers: []
+      companyOffers: [],
+      bodyHeight: ""
     };
   },
   created() {
     this.getDetail();
   },
+  mounted() {
+    this.bodyHeight = document.documentElement.clientHeight;
+  },
   methods: {
     getDetail() {
       let vm = this;
+      vm.fileList = [];
+      vm.companyOffers = [];
       Indicator.open();
       http
         .get(api.COMPANYINFO, {
@@ -250,15 +266,29 @@ export default {
           if (resp.data.data.claimStatus) {
             vm.isClaimed = true;
           }
-          vm.startTime = resp.data.data.businessHours.split("-")[0];
-          vm.endTime = resp.data.data.businessHours.split("-")[1];
-          vm.companyOffers = resp.data.data.companyOffers;
-          let pictures = resp.data.data.corporatePictures.split(";");
-          pictures.map(v => {
-            vm.fileList.push({
-              url: v
+          if (resp.data.data.businessHours) {
+            vm.startTime = resp.data.data.businessHours.split("-")[0];
+            vm.endTime = resp.data.data.businessHours.split("-")[1];
+          }
+          resp.data.data.companyOffers.map(v => {
+            vm.companyOffers.push({
+              companyID: v.companyID,
+              offerTitle: v.offerTitle,
+              offerStartTime: v.offerStartTime,
+              offerEndTime: v.offerEndTime,
+              offerDescription: v.offerDescription
             });
           });
+          if (resp.data.data.corporatePictures) {
+            let pictures = resp.data.data.corporatePictures.split(";");
+            pictures.map(v => {
+              if (v != "") {
+                vm.fileList.push({
+                  url: v
+                });
+              }
+            });
+          }
         });
     },
     blur() {
@@ -284,6 +314,9 @@ export default {
     //   this.offerDescription = "";
     // },
     add() {
+      if (!this.canEdit) {
+        return;
+      }
       this.isShowAdd = true;
       this.offerTitle = "";
       this.date = "";
@@ -294,6 +327,12 @@ export default {
       const [start, end] = date;
       this.show = false;
       this.date = `${this.toDate(start)} ~ ${this.toDate(end)}`;
+    },
+    deleteOffer(index) {
+      if (!this.canEdit) {
+        return;
+      }
+      this.companyOffers.splice(index, 1);
     },
     showStartTime() {
       if (!this.canEdit) {
@@ -307,20 +346,74 @@ export default {
       }
       this.isShowEndTime = true;
     },
+    unclaimCompany() {
+      let vm = this;
+      Indicator.open();
+      Dialog.confirm({
+        title: "取消认领",
+        message: "确认要取消次商铺的认领吗？"
+      })
+        .then(() => {
+          http
+            .post(api.UNCLAIMCOMPANY, {
+              companyID: vm.$route.query.companyID
+            })
+            .then(resp => {
+              Indicator.close();
+              if (resp.data.success) {
+                this.isClaimed = false;
+                Notify({ type: "success", message: "取消成功" });
+              } else {
+                Notify({ type: "warning", message: "取消失败" });
+              }
+              vm.getDetail();
+            });
+        })
+        .catch(() => {});
+    },
+    punch() {
+      let vm = this;
+      Dialog.confirm({
+        title: "企业打卡",
+        message: "确认要进行改企业打卡吗？"
+      }).then(() => {
+        Indicator.open();
+        http
+          .post(api.PUNCHIN, {
+            companyID: vm.$route.query.companyID
+          })
+          .then(resp => {
+            Indicator.close();
+            if (resp.data.success) {
+              Notify({ type: "success", message: "打卡成功" });
+            } else {
+              Notify({ type: "warning", message: "打卡失败" });
+            }
+            vm.getDetail();
+          });
+      });
+    },
     afterRead(file) {
       console.log(file);
     },
     comfirmCommit() {
       let vm = this;
+      Indicator.open();
       http
         .post(api.CLAIMCOMPANY, {
           companyID: vm.$route.query.companyID
         })
         .then(resp => {
-          console.log(resp);
+          Indicator.close();
+          if (resp.data.success) {
+            this.isClaimed = true;
+            this.isShowClaim = false;
+            Notify({ type: "success", message: "认领成功" });
+            vm.getDetail();
+          } else {
+            Notify({ type: "warning", message: "认领失败" });
+          }
         });
-      this.isClaimed = true;
-      this.isShowClaim = false;
     },
     confirmStart(value) {
       this.startTime = value;
@@ -342,22 +435,25 @@ export default {
         path: "/enterpriseMap"
       });
     },
+    cancel() {
+      vm.getDetail();
+    },
     saveConfirm() {
       let vm = this;
+      Indicator.open();
       let formData = new FormData();
       // let files = [];
       // console.log(this.fileList);
+      let arr = [];
       this.fileList.map(v => {
-        // if (v.url) {
-        //   formData.append("corporatePictures", v.url);
-        // }
-        //  else {
-        //   formData.append("file", v.file);
-        // }
-        formData.append("file", v.file);
+        if (!v.url) {
+          formData.append("file", v.file);
+        }
+        if (v.url) {
+          arr.push(v.url);
+        }
       });
-      // JSON.stringify(vm.companyOffers);
-
+      formData.append("corporatePictures", arr.join(";"));
       formData.append("companyID", vm.$route.query.companyID);
       formData.append("companyName", vm.enterpriseName);
       formData.append("linkPhone", vm.phoneNumber);
@@ -369,7 +465,14 @@ export default {
       // console.log(vm.companyOffers.join(','));
       // console.log(formData.get('companyOffers'))
       http.upload(api.COMPANYINFOMODIFY, formData, vm).then(resp => {
-        console.log(resp);
+        Indicator.close();
+        if (resp.data.success) {
+          this.isClaimed = false;
+          Notify({ type: "success", message: "修改成功" });
+          vm.getDetail();
+        } else {
+          Notify({ type: "warning", message: "取消失败" });
+        }
       });
     }
   },
@@ -442,7 +545,7 @@ export default {
         .name {
           font-family: "FZSong";
           font-size: 16px;
-          width: 65px;
+          width: 75px;
           text-align: center;
         }
         .value {
@@ -485,7 +588,7 @@ export default {
         .name {
           font-family: "FZSong";
           font-size: 16px;
-          width: 65px;
+          width: 75px;
           text-align: center;
         }
         .value {
@@ -553,7 +656,7 @@ export default {
       width: 100%;
       overflow: hidden;
       .offers-list {
-        width: 750px;
+        width: 770px;
         min-height: 68px;
         background-color: #fff;
         overflow: hidden;
@@ -564,11 +667,19 @@ export default {
         }
         .offer-item {
           float: left;
-          width: 247px;
+          width: 255px;
           height: 119px;
           background: url("../../assets/image/offer-bg.png") no-repeat;
           background-size: 100% 100%;
           padding-left: 20px;
+          position: relative;
+          .close-icon {
+            position: absolute;
+            right: 10px;
+            top: 25px;
+            font-size: 18px;
+            color: #fff;
+          }
           .offer-name {
             display: flex;
             align-items: center;

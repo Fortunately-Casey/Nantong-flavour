@@ -1,5 +1,5 @@
 <template>
-  <div class="enterprise-list">
+  <div class="enterprise-list" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
     <div class="top">
       <div class="back" @click="goback"><van-icon name="arrow-left" />返回</div>
       企业列表
@@ -29,11 +29,15 @@ export default {
   data() {
     return {
       barList: [],
-      indexList: []
+      indexList: [],
+      bodyHeight:""
     };
   },
   created() {
     this.getCompanyList();
+  },
+  mounted() {
+    this.bodyHeight = document.documentElement.clientHeight;
   },
   methods: {
     getCompanyList() {

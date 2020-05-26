@@ -42,8 +42,8 @@ esriLoader.loadScript({
       }
     ]
   },
-  url: "https://js.arcgis.com/3.19/init.js"
-  // url: "/arcgis/arcgis_js_api/library/3.19/3.19/init.js"
+  // url: "https://js.arcgis.com/3.19/init.js"
+  url: "/static/arcgis/init.js"
 });
 new Vue({
   router,

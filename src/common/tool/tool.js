@@ -26,8 +26,8 @@ export function getURL(url) {
   if (process.env.NODE_ENV === "development") {
     _result = `/api${url}`; // 开发环境会自动走代理
   } else if (process.env.NODE_ENV === "production") {
-    _result = `https://yqfk.ntkfqjy.com:20000/api${url}`; // 正式环境地址
-    // _result = `http://192.168.3.14:9090/api${url}`; // 正式环境地址
+    // _result = `https://yqfk.ntkfqjy.com:20000/api${url}`; // 正式环境地址
+    _result = `/api${url}`; // 正式环境地址
   }
   return _result;
 }

@@ -1,8 +1,26 @@
 <template>
-  <div class="enterprise-map">
+  <div
+    class="enterprise-map"
+    :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }"
+  >
     <div class="top">
       <div class="search-icon"></div>
-      <input type="text" placeholder="输入企业名称搜索" v-model="companyName" />
+      <input
+        type="text"
+        placeholder="输入企业名称搜索"
+        v-model="companyName"
+        @input="companyNameSearch"
+      />
+      <div class="search-list" v-if="isShowSearchList">
+        <div
+          class="search-item"
+          v-for="(item, index) in barList"
+          :key="index"
+          @click="choseCompany(item)"
+        >
+          {{ item.companyName }}
+        </div>
+      </div>
       <div class="enterprise-button" @click="goToEnterpriseList">企业列表</div>
     </div>
     <div id="map">
@@ -11,9 +29,15 @@
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
         <div class="box"></div>
-        <div class="text">{{ isShowEntry ? "该企业尚未有人认领" : "该企业已被认领" }}</div>
+        <div class="text">
+          {{ isShowEntry ? "该企业尚未有人认领" : "该企业已被认领" }}
+        </div>
         <div class="entry-button" @click="goToClaim" v-if="isShowEntry"></div>
-        <div class="entry-button" @click="goToClaim" v-if="isShowGetEntry"></div>
+        <div
+          class="entry-button"
+          @click="goToClaim"
+          v-if="isShowGetEntry"
+        ></div>
       </div>
     </van-action-sheet>
   </div>
@@ -25,8 +49,9 @@ import { Indicator } from "mint-ui";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
 import { Notify } from "vant";
-import { EventBus } from "@/common/eventBus.js";
 import { debounce } from "@/common/tool/tool";
+import LocationSdk from "@/common/location-sdk";
+import blueloc from "@/assets/image/blue-loc.png";
 export default {
   data() {
     return {
@@ -38,7 +63,10 @@ export default {
       isShowEntry: false,
       isShowGetEntry: false,
       id: "",
-      isWatchCompanyName: true
+      isWatchCompanyName: true,
+      barList: [],
+      isShowSearchList: false,
+      bodyHeight: ""
     };
   },
   created() {
@@ -49,6 +77,7 @@ export default {
         if (!vm.isWatchCompanyName) {
           return;
         }
+        Indicator.open();
         http
           .get(
             api.COMPANYLIST,
@@ -58,30 +87,30 @@ export default {
             vm
           )
           .then(resp => {
-            // Indicator.close();
+            Indicator.close();
             let res = resp.data.data;
             // console.log(res);
             let arr = [];
             for (var k in res) {
-              arr.concat(res[k]);
+              arr = arr.concat(res[k]);
             }
-            console.log(arr);
-            // vm.barList = arr;
+            vm.barList = arr;
           });
       })
     );
   },
   mounted() {
+    this.bodyHeight = document.documentElement.clientHeight;
     let vm = this;
     Indicator.open();
-    // setTimeout(() => {
-    // this.getLocation();
-    // }, 2000);
+    setTimeout(() => {
+      this.getLocation();
+    }, 2000);
     // setTimeout(() => {
     //   this.createMap();
     // });
     // this.$nextTick(function() {
-    this.createMap();
+    // this.createMap();
     // });
   },
   methods: {
@@ -154,20 +183,20 @@ export default {
           );
           vm.map.addLayer(dynamicLayer);
           vm.map.addLayer(dynamicLayer1);
-          // let point = new Point({
-          //   x: vm.location.longitude,
-          //   y: vm.location.latitude,
-          //   spatialReference: {
-          //     wkid: 4490
-          //   }
-          // });
           let point = new Point({
-            x: 120.86448335647579,
-            y: 32.00571294529357,
+            x: Number(vm.location.longitude),
+            y: Number(vm.location.latitude),
             spatialReference: {
               wkid: 4490
             }
           });
+          // let point = new Point({
+          //   x: 120.86448335647579,
+          //   y: 32.00571294529357,
+          //   spatialReference: {
+          //     wkid: 4490
+          //   }
+          // });
           // console.log(111)
           if (vm.$route.query.companyID) {
             http
@@ -179,23 +208,25 @@ export default {
                 if (resp.data.data) {
                   vm.enterpriseName = resp.data.data.companyName;
                   vm.id = resp.data.data.companyID;
-                  console.log(resp.data.data);
                   let point1 = new Point({
-                    x: resp.data.data.longitude,
-                    y: resp.data.data.latitude,
+                    x: Number(resp.data.data.longitude),
+                    y: Number(resp.data.data.latitude),
                     spatialReference: {
                       wkid: 4490
                     }
                   });
                   vm.map.centerAndZoom(point1, 18);
                   vm.isShowEnterprise = true;
-                  // if (!resp.data.data.claimStatus) {
-                  //   vm.isShowEntry = true;
-                  // } else if (resp.data.data.myClaimStatus) {
-                  //   vm.isShowEntry = true;
-                  // } else {
-                  //   vm.isShowEntry = false;
-                  // }
+                  if (!resp.data.data.claimStatus && resp.data.data !== 0) {
+                    vm.isShowEntry = true;
+                  } else {
+                    vm.isShowEntry = false;
+                  }
+                  if (resp.data.data.myClaimStatus) {
+                    vm.isShowGetEntry = true;
+                  } else {
+                    vm.isShowGetEntry = false;
+                  }
                 }
               });
           } else {
@@ -215,11 +246,12 @@ export default {
           //   vm.map.centerAndZoom(point1, 16);
           // }
           // vm.map.centerAndZoom(point, 16);
-          var startPointSymbol = new SimpleMarkerSymbol();
-          startPointSymbol.style = SimpleMarkerSymbol.STYLE_CIRCLE;
-          startPointSymbol.setSize(10);
-          startPointSymbol.setColor(new Colors("red"));
-          var startPointGraphic = new Graphic(point, startPointSymbol);
+          // var startPointSymbol = new SimpleMarkerSymbol();
+          // startPointSymbol.style = SimpleMarkerSymbol.STYLE_CIRCLE;
+          // startPointSymbol.setSize(10);
+          // startPointSymbol.setColor(new Colors("red"));
+          var bluelocSymbol = new PictureMarkerSymbol(blueloc, 24, 26);
+          var startPointGraphic = new Graphic(point, bluelocSymbol);
           let graphiclayer = new GraphicsLayer({
             id: "location"
           });
@@ -280,6 +312,66 @@ export default {
         }
       });
     },
+    choseCompany(item) {
+      let vm = this;
+      this.companyName = item.companyName;
+      this.isWatchCompanyName = false;
+      this.isShowSearchList = false;
+      esriLoader
+        .loadModules([
+          "esri/map",
+          "esri/geometry/Point",
+          "dojo/colors",
+          "esri/graphic",
+          "esri/layers/ArcGISTiledMapServiceLayer",
+          "esri/layers/ArcGISDynamicMapServiceLayer",
+          "esri/layers/FeatureLayer",
+          "esri/geometry/Extent",
+          "esri/renderers/HeatmapRenderer",
+          "esri/config",
+          "esri/symbols/PictureMarkerSymbol",
+          "esri/symbols/SimpleMarkerSymbol",
+          "esri/symbols/TextSymbol",
+          "esri/renderers/ClassBreaksRenderer",
+          "esri/symbols/SimpleFillSymbol",
+          "esri/symbols/SimpleLineSymbol"
+          // "custom/ClusterLayer"
+        ])
+        .then(function([
+          Map,
+          Point,
+          Colors,
+          Graphic,
+          ArcGISTiledMapServiceLayer,
+          ArcGISDynamicMapServiceLayer,
+          FeatureLayer,
+          Extent,
+          HeatmapRenderer,
+          esriConfig,
+          PictureMarkerSymbol,
+          SimpleMarkerSymbol,
+          TextSymbol,
+          ClassBreaksRenderer,
+          SimpleFillSymbol,
+          SimpleLineSymbol
+          // ClusterLayer
+        ]) {
+          let pointer2 = new Point({
+            x: Number(item.longitude),
+            y: Number(item.latitude),
+            spatialReference: {
+              wkid: 4490
+            }
+          });
+          console.log(pointer2);
+          vm.map.centerAndZoom(pointer2, 18);
+        });
+    },
+    companyNameSearch() {
+      if (!this.companyName !== "") {
+        this.isWatchCompanyName = true;
+      }
+    },
     goToEnterpriseList() {
       this.$router.push({
         path: "/enterpriseList"
@@ -290,12 +382,12 @@ export default {
       LocationSdk.getLocation({
         success: res => {
           vm.location = res;
-          Notify({
-            type: "primary",
-            message: `${vm.location.longitude};${vm.location.latitude}`
-          });
+          // Notify({
+          //   type: "primary",
+          //   message: `${vm.location.longitude};${vm.location.latitude}`
+          // });
           // alert(vm.location.longitude);
-          vm.createMap1();
+          vm.createMap();
         },
         error: res => {
           Notify({
@@ -315,10 +407,10 @@ export default {
       LocationSdk.getLocation({
         success: res => {
           vm.location = res;
-          Notify({
-            type: "primary",
-            message: `${vm.location.longitude};${vm.location.latitude}`
-          });
+          // Notify({
+          //   type: "primary",
+          //   message: `${vm.location.longitude};${vm.location.latitude}`
+          // });
           esriLoader
             .loadModules([
               "esri/map",
@@ -359,12 +451,18 @@ export default {
               // ClusterLayer
             ]) {
               let point = new Point({
-                x: vm.location.longitude,
-                y: vm.location.latitude,
+                x: Number(vm.location.longitude),
+                y: Number(vm.location.latitude),
                 spatialReference: {
                   wkid: 4490
                 }
               });
+              let layer = vm.map.getLayer("location");
+              layer.clear();
+              var bluelocSymbol = new PictureMarkerSymbol(blueloc, 24, 26);
+              var startPointGraphic = new Graphic(point, bluelocSymbol);
+              layer.add(startPointGraphic);
+              // vm.map.addLayer(layer);
               vm.map.centerAndZoom(point, 16);
             });
         },
@@ -381,11 +479,27 @@ export default {
         }
       });
     }
+  },
+  watch: {
+    companyName() {
+      if (this.companyName === "") {
+        this.isShowSearchList = false;
+        this.isWatchCompanyName = false;
+      }
+    },
+    barList() {
+      if (this.barList.length === 0) {
+        this.isShowSearchList = false;
+      } else {
+        this.isShowSearchList = true;
+      }
+    }
   }
 };
 </script>
 
 <style lang="less" scoped>
+@import url("/static/arcgis/esri.css");
 .enterprise-map {
   width: 100%;
   height: 100%;
@@ -417,6 +531,22 @@ export default {
       left: 20px;
       top: 50%;
       transform: translateY(-50%);
+    }
+    .search-list {
+      width: 250px;
+      height: 150px;
+      border: 1px solid #eee;
+      position: absolute;
+      left: 10px;
+      top: 42px;
+      z-index: 999;
+      background-color: #fff;
+      .search-item {
+        padding-left: 20px;
+        height: 35px;
+        line-height: 35px;
+        color: #000;
+      }
     }
     .enterprise-button {
       font-size: 14px;

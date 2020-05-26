@@ -74,6 +74,7 @@ import { blur } from "@/common/tool/tool";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
 import { Notify } from "vant";
+import { Indicator } from "mint-ui";
 export default {
   data() {
     return {
@@ -101,6 +102,7 @@ export default {
   },
   methods: {
     login() {
+      Indicator.open();
       let vm = this;
       if (!vm.username || !vm.userPW) {
         Notify({ type: "warning", message: "账号密码不能为空" });
@@ -111,6 +113,7 @@ export default {
         password: vm.userPW
       };
       http.post(api.Login, params, this).then(resp => {
+        Indicator.close();
         if (resp.data.success) {
           Notify({ type: "success", message: "登录成功" });
           window.localStorage.setItem("token", resp.data.data.token);

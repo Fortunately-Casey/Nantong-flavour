@@ -1,80 +1,71 @@
 <template>
-  <div class="enterprise-list">
-    <div class="top">
-      企业列表
-    </div>
+  <div class="enterprise-list" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
+    <div class="top">企业列表</div>
     <div class="content">
-      <van-index-bar>
-        <van-index-anchor index="A" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="B" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="C" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="D" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="E" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="F" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="G" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="H" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="I" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="J" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="K" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="L" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="M" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-index-anchor index="Z" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
-        <van-cell title="文本" />
+      <van-index-bar :index-list="indexList">
+        <div v-for="(item, index) in barList" :key="index">
+          <van-index-anchor :index="item.key" />
+          <van-cell
+            :title="v.companyName"
+            v-for="(v, i) in item.items"
+            :key="i"
+            @click="goToEnterprise(v)"
+          />
+        </div>
       </van-index-bar>
     </div>
   </div>
 </template>
 
 <script>
+import * as api from "@/service/apiList";
+import http from "@/service/service";
+// import { EventBus } from "@/common/eventBus.js";
+import { Indicator } from "mint-ui";
 export default {
   data() {
-    return {};
+    return {
+      barList: [],
+      indexList: [],
+    };
+  },
+  created() {
+    this.getCompanyList();
+  },
+  mounted() {
+    this.bodyHeight = document.documentElement.clientHeight;
   },
   methods: {
+    getCompanyList() {
+      let vm = this;
+      Indicator.open();
+      http.get(api.COMPANYLIST, {}, vm).then(resp => {
+        Indicator.close();
+        let res = resp.data.data;
+        let arr = [];
+        for (var k in res) {
+          arr.push({
+            key: k,
+            items: res[k]
+          });
+          vm.indexList.push(k);
+        }
+        console.log(arr);
+        vm.barList = arr;
+      });
+    },
+    goToEnterprise(v) {
+      // EventBus.$emit("chosedEnterprise", v);
+      this.$router.push({
+        path: "/visitorPage/visitorMap",
+        query: {
+          companyID: v.companyID
+        }
+      });
+    },
     goback() {
       this.$router.push({
-        path: "/enterpriseMap"
+        path: "/visitorPage/visitorMap"
       });
     }
   }

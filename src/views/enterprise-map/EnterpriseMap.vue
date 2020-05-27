@@ -1,15 +1,13 @@
 <template>
-  <div
-    class="enterprise-map"
-    :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }"
-  >
+  <div class="enterprise-map">
     <div class="top">
       <div class="search-icon"></div>
       <input
         type="text"
-        placeholder="输入企业名称搜索"
+        placeholder="输店铺名称搜索"
         v-model="companyName"
         @input="companyNameSearch"
+        @blur="blur"
       />
       <div class="search-list" v-if="isShowSearchList">
         <div
@@ -21,7 +19,7 @@
           {{ item.companyName }}
         </div>
       </div>
-      <div class="enterprise-button" @click="goToEnterpriseList">企业列表</div>
+      <div class="enterprise-button" @click="goToEnterpriseList">店铺列表</div>
     </div>
     <div id="map">
       <div id="LocateButton" style="display:block" @click="locationTo"></div>
@@ -30,7 +28,7 @@
       <div class="content">
         <div class="box"></div>
         <div class="text">
-          {{ isShowEntry ? "该企业尚未有人认领" : "该企业已被认领" }}
+          {{ isShowEntry ? "该店铺尚未有人认领" : "该店铺已被认领" }}
         </div>
         <div class="entry-button" @click="goToClaim" v-if="isShowEntry"></div>
         <div
@@ -49,7 +47,7 @@ import { Indicator } from "mint-ui";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
 import { Notify } from "vant";
-import { debounce } from "@/common/tool/tool";
+import { debounce, blur } from "@/common/tool/tool";
 import LocationSdk from "@/common/location-sdk";
 import blueloc from "@/assets/image/blue-loc.png";
 export default {
@@ -103,17 +101,20 @@ export default {
     this.bodyHeight = document.documentElement.clientHeight;
     let vm = this;
     Indicator.open();
-    setTimeout(() => {
-      this.getLocation();
-    }, 2000);
+    // setTimeout(() => {
+    //   this.getLocation();
+    // }, 2000);
     // setTimeout(() => {
     //   this.createMap();
     // });
     // this.$nextTick(function() {
-    // this.createMap();
+    this.createMap();
     // });
   },
   methods: {
+    blur() {
+      blur();
+    },
     createMap() {
       let vm = this;
       esriLoader
@@ -183,20 +184,20 @@ export default {
           );
           vm.map.addLayer(dynamicLayer);
           vm.map.addLayer(dynamicLayer1);
-          let point = new Point({
-            x: Number(vm.location.longitude),
-            y: Number(vm.location.latitude),
-            spatialReference: {
-              wkid: 4490
-            }
-          });
           // let point = new Point({
-          //   x: 120.86448335647579,
-          //   y: 32.00571294529357,
+          //   x: Number(vm.location.longitude),
+          //   y: Number(vm.location.latitude),
           //   spatialReference: {
           //     wkid: 4490
           //   }
           // });
+          let point = new Point({
+            x: 120.86448335647579,
+            y: 32.00571294529357,
+            spatialReference: {
+              wkid: 4490
+            }
+          });
           // console.log(111)
           if (vm.$route.query.companyID) {
             http

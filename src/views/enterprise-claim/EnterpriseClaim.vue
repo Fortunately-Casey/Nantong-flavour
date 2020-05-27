@@ -5,15 +5,15 @@
   >
     <div class="top">
       <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
-      企业认领
-      <div class="edit" :class="canEdit ? 'can-edit' : ''" @click="edit">
+      店铺认领
+      <div class="edit" :class="canEdit ? '' : 'can-edit'" @click="edit">
         编辑
       </div>
     </div>
     <div class="content">
       <div class="enterprise-info">
         <div class="item">
-          <div class="name">企业名称</div>
+          <div class="name">店铺名称</div>
           <div class="value">
             <input
               type="text"
@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="item">
-          <div class="name">企业电话</div>
+          <div class="name">店铺电话</div>
           <div class="value">
             <input
               type="text"
@@ -38,13 +38,13 @@
           <div class="name">营业时间</div>
           <div class="value">
             <!-- {{ startTime }} -->
-            <div class="start" @click="showStartTime">{{ startTime }}</div>
-            -
             <div class="end" @click="showEndTime">{{ endTime }}</div>
+            -
+            <div class="start" @click="showStartTime">{{ startTime }}</div>
           </div>
         </div>
         <div class="item" style="padding:0;margin:0 16px">
-          <div class="name">企业地址</div>
+          <div class="name">店铺地址</div>
           <div class="value"></div>
         </div>
         <div class="item">
@@ -62,7 +62,7 @@
       </div>
       <div class="enterprise-explain">
         <div class="item">
-          <div class="name">企业说明</div>
+          <div class="name">店铺说明</div>
         </div>
         <div class="text-area">
           <textarea
@@ -75,7 +75,7 @@
         </div>
       </div>
       <div class="enterprise-photo">
-        <div class="left">企业照片</div>
+        <div class="left">店铺照片</div>
         <scroll class="wrapper1">
           <div class="right">
             <van-uploader
@@ -139,7 +139,7 @@
       <van-popup v-model="isShowClaim" round>
         <div class="commit-affirm">
           <div class="text">
-            请确认这是您的企业后再进行提交哦～ 是否确认提交？
+            请确认这是您的店铺后再进行提交哦～ 是否确认提交？
           </div>
           <div class="buttons">
             <div class="canncel" @click="isShowClaim = false">再想想</div>
@@ -376,8 +376,8 @@ export default {
     punch() {
       let vm = this;
       Dialog.confirm({
-        title: "企业打卡",
-        message: "确认要进行改企业打卡吗？"
+        title: "店铺打卡",
+        message: "确认要进行改店铺打卡吗？"
       }).then(() => {
         Indicator.open();
         http
@@ -444,7 +444,7 @@ export default {
       let vm = this;
       Dialog.confirm({
         title: "保存更改",
-        message: "确认要保存改企业信息吗？"
+        message: "确认要保存改店铺信息吗？"
       }).then(() => {
         Indicator.open();
         let formData = new FormData();
@@ -658,7 +658,6 @@ export default {
       .wrapper1 {
         width: 100%;
         overflow: hidden;
-        -webkit-overflow-scrolling: touch;
         .right {
           // flex: 1;
           width: 800px;
@@ -671,7 +670,6 @@ export default {
     .wrapper {
       width: 100%;
       overflow: hidden;
-      -webkit-overflow-scrolling: touch;
       .offers-list {
         width: 770px;
         min-height: 68px;

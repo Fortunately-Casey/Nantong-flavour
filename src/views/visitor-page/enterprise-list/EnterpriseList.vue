@@ -1,6 +1,6 @@
 <template>
   <div class="enterprise-list" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
-    <div class="top">企业列表</div>
+    <div class="top">店铺列表</div>
     <div class="content">
       <van-index-bar :index-list="indexList">
         <div v-for="(item, index) in barList" :key="index">

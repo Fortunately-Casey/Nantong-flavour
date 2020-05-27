@@ -4,9 +4,10 @@
       <div class="search-icon"></div>
       <input
         type="text"
-        placeholder="输入企业名称搜索"
+        placeholder="输入店铺名称搜索"
         v-model="companyName"
         @input="companyNameSearch"
+        @blur="blur"
       />
       <div class="search-list" v-if="isShowSearchList">
         <div
@@ -25,7 +26,7 @@
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
         <div class="box"></div>
-        <div class="entry-button" @click="goToClaim" >查看企业</div>
+        <div class="entry-button" @click="goToClaim" >查看店铺</div>
       </div>
     </van-action-sheet>
   </div>
@@ -37,7 +38,7 @@ import { Indicator } from "mint-ui";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
 import { Notify } from "vant";
-import { debounce } from "@/common/tool/tool";
+import { debounce , blur} from "@/common/tool/tool";
 import LocationSdk from "@/common/location-sdk";
 import blueloc from "@/assets/image/blue-loc.png";
 export default {
@@ -91,17 +92,20 @@ export default {
     this.bodyHeight = document.documentElement.clientHeight;
     let vm = this;
     Indicator.open();
-    setTimeout(() => {
-      this.getLocation();
-    }, 2000);
+    // setTimeout(() => {
+    //   this.getLocation();
+    // }, 2000);
     // setTimeout(() => {
     //   this.createMap();
     // });
     // this.$nextTick(function() {
-    // this.createMap();
+    this.createMap();
     // });
   },
   methods: {
+    blur() {
+      blur();
+    },
     createMap() {
       let vm = this;
       esriLoader
@@ -171,20 +175,20 @@ export default {
           );
           vm.map.addLayer(dynamicLayer);
           vm.map.addLayer(dynamicLayer1);
-          let point = new Point({
-            x: Number(vm.location.longitude),
-            y: Number(vm.location.latitude),
-            spatialReference: {
-              wkid: 4490
-            }
-          });
           // let point = new Point({
-          //   x: 120.86448335647579,
-          //   y: 32.00571294529357,
+          //   x: Number(vm.location.longitude),
+          //   y: Number(vm.location.latitude),
           //   spatialReference: {
           //     wkid: 4490
           //   }
           // });
+          let point = new Point({
+            x: 120.86448335647579,
+            y: 32.00571294529357,
+            spatialReference: {
+              wkid: 4490
+            }
+          });
           // console.log(111)
           if (vm.$route.query.companyID) {
             http
@@ -265,7 +269,7 @@ export default {
                 let params = {
                   companyID: resp[0].feature.attributes.ID
                 };
-                http.get(api.COMPANYINFO, params).then(resp => {
+                http.get(api.COMPANYINFOBYTEMP, params).then(resp => {
                   Indicator.close();
                   if (resp.data.data) {
                     vm.enterpriseName = resp.data.data.companyName;

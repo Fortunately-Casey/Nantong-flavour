@@ -5,12 +5,12 @@
   >
     <div class="top">
       <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
-      企业详情
+      店铺详情
     </div>
     <div class="content">
       <div class="name">{{ enterpriseName }}</div>
       <div class="image-content">
-        <div class="name">企业图片</div>
+        <div class="name">店铺图片</div>
         <scroll class="wrapper1">
           <div class="image-list">
             <van-image
@@ -48,7 +48,7 @@
       <div class="enterprise-info">
         <div class="info">
           <div class="icon"></div>
-          企业说明
+          店铺说明
         </div>
         <div class="info-text">{{ description }}</div>
       </div>
@@ -247,7 +247,6 @@ export default {
       .wrapper1 {
         width: 100%;
         overflow: hidden;
-        -webkit-overflow-scrolling: touch;
         .image-list {
           width: 1000px;
           img {
@@ -386,7 +385,6 @@ export default {
       .wrapper {
         width: 100%;
         overflow: hidden;
-        -webkit-overflow-scrolling: touch;
         .offers-list {
           width: 770px;
           min-height: 68px;

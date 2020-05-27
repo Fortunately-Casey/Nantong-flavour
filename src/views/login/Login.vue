@@ -102,7 +102,6 @@ export default {
   },
   methods: {
     login() {
-      Indicator.open();
       let vm = this;
       if (!vm.username || !vm.userPW) {
         Notify({ type: "warning", message: "账号密码不能为空" });
@@ -112,6 +111,7 @@ export default {
         adminUserID: vm.username,
         password: vm.userPW
       };
+      Indicator.open();
       http.post(api.Login, params, this).then(resp => {
         Indicator.close();
         if (resp.data.success) {

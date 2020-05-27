@@ -75,7 +75,8 @@ export default {
         scrollY: true,
         scrollX: true,
         startY: this.startY,
-        pullUpLoad: this.pullup
+        pullUpLoad: this.pullup,
+        bounce: false
       });
       this.$emit("setScroll", this.scroll);
       if (this.listenScroll) {

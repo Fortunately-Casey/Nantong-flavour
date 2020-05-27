@@ -2,7 +2,7 @@
   <div class="enterprise-list" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
     <div class="top">
       <div class="back" @click="goback"><van-icon name="arrow-left" />返回</div>
-      企业列表
+      店铺列表
     </div>
     <div class="content">
       <van-index-bar :index-list="indexList">

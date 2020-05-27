@@ -9,7 +9,7 @@
       <div class="right" @click="choseTab(1)">
         <div class="icon" :class="chosedIndex === 1 ? 'active' : ''"></div>
         <div class="name" :class="chosedIndex === 1 ? 'chosed' : ''">
-          企业列表
+          店铺列表
         </div>
       </div>
     </div>

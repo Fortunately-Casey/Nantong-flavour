@@ -26,7 +26,7 @@
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
         <div class="box"></div>
-        <div class="entry-button" @click="goToClaim" >查看店铺</div>
+        <div class="entry-button" @click="goToClaim">查看店铺</div>
       </div>
     </van-action-sheet>
   </div>
@@ -38,7 +38,7 @@ import { Indicator } from "mint-ui";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
 import { Notify } from "vant";
-import { debounce , blur} from "@/common/tool/tool";
+import { debounce, blur } from "@/common/tool/tool";
 import LocationSdk from "@/common/location-sdk";
 import blueloc from "@/assets/image/blue-loc.png";
 export default {
@@ -54,8 +54,8 @@ export default {
       id: "",
       isWatchCompanyName: true,
       barList: [],
-      isShowSearchList: false,
-      bodyHeight: ""
+      isShowSearchList: false
+      // bodyHeight: ""
     };
   },
   created() {
@@ -89,18 +89,13 @@ export default {
     );
   },
   mounted() {
-    this.bodyHeight = document.documentElement.clientHeight;
+    // this.bodyHeight = document.documentElement.clientHeight;
     let vm = this;
     Indicator.open();
-    // setTimeout(() => {
-    //   this.getLocation();
-    // }, 2000);
-    // setTimeout(() => {
-    //   this.createMap();
-    // });
-    // this.$nextTick(function() {
-    this.createMap();
-    // });
+    setTimeout(() => {
+      this.getLocation();
+    }, 2000);
+    // this.createMap();
   },
   methods: {
     blur() {
@@ -153,15 +148,7 @@ export default {
           SimpleLineSymbol
           // ClusterLayer
         ]) {
-          // var initialExtent = new Extent(
-          //   120.893798,
-          //   31.793207,
-          //   121.084289,
-          //   31.987909,
-          //   new esri.SpatialReference({ wkid: 4490 })
-          // );
           vm.map = new Map("map", {
-            // extent: initialExtent,
             center: [0, 0],
             logo: false,
             slider: false,
@@ -175,20 +162,20 @@ export default {
           );
           vm.map.addLayer(dynamicLayer);
           vm.map.addLayer(dynamicLayer1);
-          // let point = new Point({
-          //   x: Number(vm.location.longitude),
-          //   y: Number(vm.location.latitude),
-          //   spatialReference: {
-          //     wkid: 4490
-          //   }
-          // });
           let point = new Point({
-            x: 120.86448335647579,
-            y: 32.00571294529357,
+            x: Number(vm.location.longitude),
+            y: Number(vm.location.latitude),
             spatialReference: {
               wkid: 4490
             }
           });
+          // let point = new Point({
+          //   x: 120.86448335647579,
+          //   y: 32.00571294529357,
+          //   spatialReference: {
+          //     wkid: 4490
+          //   }
+          // });
           // console.log(111)
           if (vm.$route.query.companyID) {
             http
@@ -274,17 +261,23 @@ export default {
                   if (resp.data.data) {
                     vm.enterpriseName = resp.data.data.companyName;
                     vm.id = resp.data.data.companyID;
-                    vm.isShowEnterprise = true;
-                    if (!resp.data.data.claimStatus) {
-                      vm.isShowEntry = true;
-                    } else {
-                      vm.isShowEntry = false;
-                    }
-                    if (resp.data.data.myClaimStatus) {
-                      vm.isShowGetEntry = true;
-                    } else {
-                      vm.isShowGetEntry = false;
-                    }
+                    vm.$router.push({
+                      path: "/enterpriseDetail",
+                      query: {
+                        companyID: vm.id
+                      }
+                    });
+                    // vm.isShowEnterprise = true;
+                    // if (!resp.data.data.claimStatus) {
+                    //   vm.isShowEntry = true;
+                    // } else {
+                    //   vm.isShowEntry = false;
+                    // }
+                    // if (resp.data.data.myClaimStatus) {
+                    //   vm.isShowGetEntry = true;
+                    // } else {
+                    //   vm.isShowGetEntry = false;
+                    // }
                   }
                   console.log(resp.data.data);
                 });
@@ -525,14 +518,14 @@ export default {
       transform: translateY(-50%);
     }
     .search-list {
-      width: 250px;
+      width: 95%;
       height: 150px;
       border: 1px solid #eee;
       position: absolute;
       left: 10px;
       top: 42px;
       z-index: 999;
-      background-color: #fff;
+      background-color: rgba(255, 255, 255, 0.8);
       .search-item {
         padding-left: 20px;
         height: 35px;

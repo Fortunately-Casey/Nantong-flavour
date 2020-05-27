@@ -28,8 +28,8 @@ Vue.use(Mint);
 //   },
 //   url: "https://js.arcgis.com/3.28/"
 // });
-esriLoader.loadCss("https://js.arcgis.com/3.19/dijit/themes/tundra/tundra.css");
-esriLoader.loadCss("https://js.arcgis.com/3.19/esri/css/esri.css");
+// esriLoader.loadCss("https://js.arcgis.com/3.19/dijit/themes/tundra/tundra.css");
+// esriLoader.loadCss("https://js.arcgis.com/3.19/esri/css/esri.css");
 // esriLoader.loadCss("/arcgis/arcgis_js_api/library/3.19/3.19/esri/css/esri.css");
 
 esriLoader.loadScript({

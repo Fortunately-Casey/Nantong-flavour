@@ -97,6 +97,9 @@ export default {
       this.userPW = password;
     }
   },
+    beforeDestroy() {
+    window.event.returnValue = true;
+  },
   mounted() {
     this.bodyHeight = document.documentElement.clientHeight;
   },

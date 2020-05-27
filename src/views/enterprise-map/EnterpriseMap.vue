@@ -26,16 +26,21 @@
     </div>
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
-        <div class="box"></div>
+        <div :class="isShowEntry ? 'box' : 'claimed'"></div>
         <div class="text">
           {{ isShowEntry ? "该店铺尚未有人认领" : "该店铺已被认领" }}
         </div>
+        <div class="bottom" v-if="isShowGetEntry">
+          <div class="claim-cancel" @click="unclaimCompany">取消</div>
+          <div class="punch-button" @click="punch">打卡</div>
+          <div class="punch-button" @click="goToClaim">详情</div>
+        </div>
         <div class="entry-button" @click="goToClaim" v-if="isShowEntry"></div>
-        <div
+        <!-- <div
           class="entry-button"
           @click="goToClaim"
           v-if="isShowGetEntry"
-        ></div>
+        ></div>-->
       </div>
     </van-action-sheet>
   </div>
@@ -46,7 +51,7 @@ import esriLoader from "esri-loader";
 import { Indicator } from "mint-ui";
 import * as api from "@/service/apiList";
 import http from "@/service/service";
-import { Notify } from "vant";
+import { Dialog, Notify } from "vant";
 import { debounce, blur } from "@/common/tool/tool";
 import LocationSdk from "@/common/location-sdk";
 import blueloc from "@/assets/image/blue-loc.png";
@@ -101,15 +106,10 @@ export default {
     this.bodyHeight = document.documentElement.clientHeight;
     let vm = this;
     Indicator.open();
-    // setTimeout(() => {
-    //   this.getLocation();
-    // }, 2000);
-    // setTimeout(() => {
-    //   this.createMap();
-    // });
-    // this.$nextTick(function() {
-    this.createMap();
-    // });
+    setTimeout(() => {
+      this.getLocation();
+    }, 2000);
+    // this.createMap();
   },
   methods: {
     blur() {
@@ -162,15 +162,7 @@ export default {
           SimpleLineSymbol
           // ClusterLayer
         ]) {
-          // var initialExtent = new Extent(
-          //   120.893798,
-          //   31.793207,
-          //   121.084289,
-          //   31.987909,
-          //   new esri.SpatialReference({ wkid: 4490 })
-          // );
           vm.map = new Map("map", {
-            // extent: initialExtent,
             center: [0, 0],
             logo: false,
             slider: false,
@@ -184,21 +176,20 @@ export default {
           );
           vm.map.addLayer(dynamicLayer);
           vm.map.addLayer(dynamicLayer1);
-          // let point = new Point({
-          //   x: Number(vm.location.longitude),
-          //   y: Number(vm.location.latitude),
-          //   spatialReference: {
-          //     wkid: 4490
-          //   }
-          // });
           let point = new Point({
-            x: 120.86448335647579,
-            y: 32.00571294529357,
+            x: Number(vm.location.longitude),
+            y: Number(vm.location.latitude),
             spatialReference: {
               wkid: 4490
             }
           });
-          // console.log(111)
+          // let point = new Point({
+          //   x: 120.86448335647579,
+          //   y: 32.00571294529357,
+          //   spatialReference: {
+          //     wkid: 4490
+          //   }
+          // });
           if (vm.$route.query.companyID) {
             http
               .get(api.COMPANYINFO, {
@@ -218,12 +209,18 @@ export default {
                   });
                   vm.map.centerAndZoom(point1, 18);
                   vm.isShowEnterprise = true;
-                  if (!resp.data.data.claimStatus && resp.data.data !== 0) {
+                  if (
+                    !resp.data.data.claimStatus &&
+                    resp.data.data.claimStatus !== 0
+                  ) {
                     vm.isShowEntry = true;
                   } else {
                     vm.isShowEntry = false;
                   }
-                  if (resp.data.data.myClaimStatus) {
+                  if (
+                    resp.data.data.myClaimStatus &&
+                    resp.data.data.claimStatus
+                  ) {
                     vm.isShowGetEntry = true;
                   } else {
                     vm.isShowGetEntry = false;
@@ -233,24 +230,6 @@ export default {
           } else {
             vm.map.centerAndZoom(point, 16);
           }
-          // if (!vm.chosedEnterprise) {
-          //   vm.map.centerAndZoom(point, 16);
-          // } else {
-          //   let point1 = new Point({
-          //     x: vm.chosedEnterprise.longitude,
-          //     y: vm.chosedEnterprise.latitude,
-          //     spatialReference: {
-          //       wkid: 4490
-          //     }
-          //   });
-          //   console.log("1111");
-          //   vm.map.centerAndZoom(point1, 16);
-          // }
-          // vm.map.centerAndZoom(point, 16);
-          // var startPointSymbol = new SimpleMarkerSymbol();
-          // startPointSymbol.style = SimpleMarkerSymbol.STYLE_CIRCLE;
-          // startPointSymbol.setSize(10);
-          // startPointSymbol.setColor(new Colors("red"));
           var bluelocSymbol = new PictureMarkerSymbol(blueloc, 24, 26);
           var startPointGraphic = new Graphic(point, bluelocSymbol);
           let graphiclayer = new GraphicsLayer({
@@ -289,7 +268,10 @@ export default {
                     } else {
                       vm.isShowEntry = false;
                     }
-                    if (resp.data.data.myClaimStatus) {
+                    if (
+                      resp.data.data.myClaimStatus &&
+                      resp.data.data.claimStatus
+                    ) {
                       vm.isShowGetEntry = true;
                     } else {
                       vm.isShowGetEntry = false;
@@ -479,6 +461,53 @@ export default {
           };
         }
       });
+    },
+    unclaimCompany() {
+      let vm = this;
+      Indicator.open();
+      Dialog.confirm({
+        title: "取消认领",
+        message: "确认要取消次商铺的认领吗？"
+      })
+        .then(() => {
+          http
+            .post(api.UNCLAIMCOMPANY, {
+              companyID: vm.id
+            })
+            .then(resp => {
+              Indicator.close();
+              if (resp.data.success) {
+                // this.isClaimed = false;
+                vm.isShowEnterprise = false;
+                Notify({ type: "success", message: "取消成功" });
+              } else {
+                Notify({ type: "warning", message: resp.data.message });
+              }
+            });
+        })
+        .catch(() => {});
+    },
+    punch() {
+      let vm = this;
+      Dialog.confirm({
+        title: "店铺打卡",
+        message: "确认要进行改店铺打卡吗？"
+      }).then(() => {
+        Indicator.open();
+        http
+          .post(api.PUNCHIN, {
+            companyID: vm.id
+          })
+          .then(resp => {
+            Indicator.close();
+            if (resp.data.success) {
+              Notify({ type: "success", message: "打卡成功" });
+            } else {
+              Notify({ type: "warning", message: resp.data.message });
+            }
+            vm.getDetail();
+          });
+      });
     }
   },
   watch: {
@@ -578,6 +607,44 @@ export default {
       width: 98px;
       height: 100px;
       background: url("../../assets/image/box.png") no-repeat;
+      background-size: 100% 100%;
+      margin: 0 auto;
+    }
+    .bottom {
+      width: 100%;
+      // height: 40px;
+      padding-top: 30px;
+      padding-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .claim-cancel {
+        width: 102px;
+        height: 42px;
+        background: url("../../assets/image/cancel-button-out.png") no-repeat;
+        background-size: 100% 100%;
+        text-align: center;
+        line-height: 42px;
+        font-family: "FZSong";
+        margin: 0 5px;
+        color: #975b16;
+      }
+      .punch-button {
+        width: 102px;
+        height: 42px;
+        background: url("../../assets/image/punch-icon-out.png") no-repeat;
+        background-size: 100% 100%;
+        text-align: center;
+        line-height: 42px;
+        font-family: "FZSong";
+        margin: 0 5px;
+        color: #fff;
+      }
+    }
+    .claimed {
+      width: 127px;
+      height: 127px;
+      background: url("../../assets/image/claimed.png") no-repeat;
       background-size: 100% 100%;
       margin: 0 auto;
     }

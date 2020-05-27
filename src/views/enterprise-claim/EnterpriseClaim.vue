@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="enterprise-claim"
-    :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }"
-  >
+  <div class="enterprise-claim">
     <div class="top">
       <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
       店铺认领
@@ -19,7 +16,7 @@
               type="text"
               @blur="blur"
               v-model="enterpriseName"
-              :disabled="!canEdit"
+              :disabled="true"
             />
           </div>
         </div>
@@ -84,6 +81,7 @@
               :after-read="afterRead"
               max-count="8"
               :disabled="!canEdit"
+              :deletable="canEdit"
             />
           </div>
         </scroll>
@@ -123,19 +121,20 @@
           </li>
         </ul>
       </scroll>
-      <div class="bottom" v-if="isClaimed && !canEdit">
-        <div class="claim-cancel" @click="unclaimCompany"></div>
-        <div class="punch-button" @click="punch"></div>
+      <div class="bottom">
+        <div class="cancel" @click="cancel" v-if="isClaimed && canEdit"></div>
+        <div
+          class="save-button"
+          @click="saveConfirm"
+          v-if="isClaimed && canEdit"
+        ></div>
+        <div
+          class="claim-button"
+          v-if="!isClaimed"
+          @click="isShowClaim = true"
+        ></div>
       </div>
-      <div class="bottom" v-if="isClaimed && canEdit">
-        <div class="cancel" @click="cancel"></div>
-        <div class="save-button" @click="saveConfirm"></div>
-      </div>
-      <div
-        class="claim-button"
-        v-if="!isClaimed"
-        @click="isShowClaim = true"
-      ></div>
+
       <van-popup v-model="isShowClaim" round>
         <div class="commit-affirm">
           <div class="text">
@@ -181,6 +180,7 @@
         name="优惠标题"
         label="优惠标题"
         placeholder="请输入优惠标题"
+        maxlength="8"
         :rules="[{ required: true, message: '请填写优惠标题' }]"
       />
       <van-field
@@ -197,6 +197,7 @@
         name="活动描述"
         label="活动描述"
         placeholder="请输入活动描述"
+        maxlength="12"
         :rules="[{ required: true, message: '请填写活动描述' }]"
       />
     </van-dialog>
@@ -242,11 +243,11 @@ export default {
       bodyHeight: ""
     };
   },
-  created() {
-    this.getDetail();
-  },
+  created() {},
   mounted() {
-    this.bodyHeight = document.documentElement.clientHeight;
+    this.$nextTick(function() {
+      this.getDetail();
+    });
   },
   methods: {
     getDetail() {
@@ -348,53 +349,6 @@ export default {
       }
       this.isShowEndTime = true;
     },
-    unclaimCompany() {
-      let vm = this;
-      Indicator.open();
-      Dialog.confirm({
-        title: "取消认领",
-        message: "确认要取消次商铺的认领吗？"
-      })
-        .then(() => {
-          http
-            .post(api.UNCLAIMCOMPANY, {
-              companyID: vm.$route.query.companyID
-            })
-            .then(resp => {
-              Indicator.close();
-              if (resp.data.success) {
-                this.isClaimed = false;
-                Notify({ type: "success", message: "取消成功" });
-              } else {
-                Notify({ type: "warning", message: resp.data.message });
-              }
-              vm.getDetail();
-            });
-        })
-        .catch(() => {});
-    },
-    punch() {
-      let vm = this;
-      Dialog.confirm({
-        title: "店铺打卡",
-        message: "确认要进行改店铺打卡吗？"
-      }).then(() => {
-        Indicator.open();
-        http
-          .post(api.PUNCHIN, {
-            companyID: vm.$route.query.companyID
-          })
-          .then(resp => {
-            Indicator.close();
-            if (resp.data.success) {
-              Notify({ type: "success", message: "打卡成功" });
-            } else {
-              Notify({ type: "warning", message: resp.data.message });
-            }
-            vm.getDetail();
-          });
-      });
-    },
     afterRead(file) {
       console.log(file);
     },
@@ -439,6 +393,7 @@ export default {
     },
     cancel() {
       this.getDetail();
+      this.canEdit = false;
     },
     saveConfirm() {
       let vm = this;
@@ -482,6 +437,9 @@ export default {
         });
       });
     }
+  },
+  beforeDestroy() {
+    window.event.returnValue = true;
   },
   components: {
     Scroll
@@ -729,8 +687,6 @@ export default {
       background: url("../../assets/image/claim-button.png") no-repeat;
       background-size: 100% 100%;
       margin: 0 auto;
-      margin-top: 20px;
-      margin-bottom: 20px;
     }
     .bottom {
       width: 100%;

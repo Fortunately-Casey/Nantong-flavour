@@ -1,5 +1,8 @@
 <template>
-  <div class="enterprise-list" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
+  <div
+    class="enterprise-list"
+    
+  >
     <div class="top">店铺列表</div>
     <div class="content">
       <van-index-bar :index-list="indexList">
@@ -26,11 +29,14 @@ export default {
   data() {
     return {
       barList: [],
-      indexList: [],
+      indexList: []
     };
   },
   created() {
     this.getCompanyList();
+  },
+    beforeDestroy() {
+    window.event.returnValue = true;
   },
   mounted() {
     this.bodyHeight = document.documentElement.clientHeight;

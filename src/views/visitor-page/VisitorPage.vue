@@ -1,5 +1,5 @@
 <template>
-  <div class="visitor" :style="{ height: bodyHeight ? bodyHeight + 'px' : '100%' }">
+  <div class="visitor">
     <router-view></router-view>
     <div class="bottom-tab">
       <div class="left" @click="choseTab(0)">
@@ -22,6 +22,9 @@ export default {
     return {
       chosedIndex: 0
     };
+  },
+  beforeDestroy() {
+    window.event.returnValue = true;
   },
   methods: {
     choseTab(index) {

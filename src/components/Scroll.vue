@@ -72,7 +72,7 @@ export default {
         swipeBounceTime: this.swipeBounceTime,
         bounceTime: this.bounceTime,
         momentumLimitTime: this.momentumLimitTime,
-        scrollY: true,
+        // scrollY: true,
         scrollX: true,
         startY: this.startY,
         pullUpLoad: this.pullup,

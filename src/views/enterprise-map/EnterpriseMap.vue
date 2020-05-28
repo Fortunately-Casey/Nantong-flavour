@@ -15,32 +15,23 @@
           v-for="(item, index) in barList"
           :key="index"
           @click="choseCompany(item)"
-        >
-          {{ item.companyName }}
-        </div>
+        >{{ item.companyName }}</div>
       </div>
       <div class="enterprise-button" @click="goToEnterpriseList">店铺列表</div>
     </div>
-    <div id="map">
+    <div id="map" ref="map">
       <div id="LocateButton" style="display:block" @click="locationTo"></div>
     </div>
     <van-action-sheet v-model="isShowEnterprise" :title="enterpriseName">
       <div class="content">
         <div :class="isShowEntry ? 'box' : 'claimed'"></div>
-        <div class="text">
-          {{ isShowEntry ? "该店铺尚未有人认领" : "该店铺已被认领" }}
-        </div>
+        <div class="text">{{ isShowEntry ? "该店铺尚未有人认领" : "该店铺已被认领" }}</div>
         <div class="bottom" v-if="isShowGetEntry">
-          <div class="claim-cancel" @click="unclaimCompany">取消</div>
+          <div class="claim-cancel" @click="unclaimCompany">取消认领</div>
           <div class="punch-button" @click="punch">打卡</div>
           <div class="punch-button" @click="goToClaim">详情</div>
         </div>
         <div class="entry-button" @click="goToClaim" v-if="isShowEntry"></div>
-        <!-- <div
-          class="entry-button"
-          @click="goToClaim"
-          v-if="isShowGetEntry"
-        ></div>-->
       </div>
     </van-action-sheet>
   </div>
@@ -69,7 +60,8 @@ export default {
       isWatchCompanyName: true,
       barList: [],
       isShowSearchList: false,
-      bodyHeight: ""
+      bodyHeight: "",
+      view: {}
     };
   },
   created() {
@@ -103,8 +95,6 @@ export default {
     );
   },
   mounted() {
-    this.bodyHeight = document.documentElement.clientHeight;
-    let vm = this;
     Indicator.open();
     setTimeout(() => {
       this.getLocation();
@@ -119,70 +109,58 @@ export default {
       let vm = this;
       esriLoader
         .loadModules([
-          "esri/map",
+          "esri/Basemap",
+          "esri/Map",
+          "esri/layers/TileLayer",
+          "esri/layers/MapImageLayer",
           "esri/geometry/Point",
-          "dojo/colors",
-          "esri/graphic",
-          "esri/layers/GraphicsLayer",
-          "esri/layers/ArcGISTiledMapServiceLayer",
-          "esri/layers/ArcGISDynamicMapServiceLayer",
-          "esri/layers/FeatureLayer",
-          "esri/geometry/Extent",
-          "esri/renderers/HeatmapRenderer",
-          "esri/tasks/IdentifyParameters",
-          "esri/tasks/IdentifyTask",
-          "esri/config",
-          "esri/symbols/PictureMarkerSymbol",
+          "esri/views/MapView",
           "esri/symbols/SimpleMarkerSymbol",
-          "esri/symbols/TextSymbol",
-          "esri/renderers/ClassBreaksRenderer",
-          "esri/symbols/SimpleFillSymbol",
-          "esri/symbols/SimpleLineSymbol"
-          // "custom/ClusterLayer"
+          "esri/symbols/PictureMarkerSymbol",
+          "esri/layers/GraphicsLayer",
+          "esri/Graphic",
+          "esri/tasks/IdentifyTask",
+          "esri/tasks/support/IdentifyParameters",
+          "esri/tasks/support/Query",
+          "esri/tasks/QueryTask",
+          "esri/tasks/support/BufferParameters",
+          "esri/geometry/SpatialReference",
+          "esri/geometry/Circle"
         ])
         .then(function([
+          Basemap,
           Map,
+          TileLayer,
+          MapImageLayer,
           Point,
-          Colors,
-          Graphic,
-          GraphicsLayer,
-          ArcGISTiledMapServiceLayer,
-          ArcGISDynamicMapServiceLayer,
-          FeatureLayer,
-          Extent,
-          HeatmapRenderer,
-          IdentifyParameters,
-          IdentifyTask,
-          esriConfig,
-          PictureMarkerSymbol,
+          MapView,
           SimpleMarkerSymbol,
-          TextSymbol,
-          ClassBreaksRenderer,
-          SimpleFillSymbol,
-          SimpleLineSymbol
-          // ClusterLayer
+          PictureMarkerSymbol,
+          GraphicsLayer,
+          Graphic,
+          IdentifyTask,
+          IdentifyParameters,
+          Query,
+          QueryTask,
+          BufferParameters,
+          SpatialReference,
+          Circle
         ]) {
-          vm.map = new Map("map", {
-            center: [0, 0],
-            logo: false,
-            slider: false,
-            zoom: 13
+          const dynamicLayer = new TileLayer({
+            url: "/gis/arcgis/rest/services/NT/DLG_1000_201900/MapServer"
           });
-          var dynamicLayer = new ArcGISTiledMapServiceLayer(
-            "/gis/arcgis/rest/services/NT/DLG_1000_201900/MapServer"
-          );
-          var dynamicLayer1 = new ArcGISDynamicMapServiceLayer(
-            "/map/arcgis/rest/services/NTWD/NTWDMapService/MapServer"
-          );
-          vm.map.addLayer(dynamicLayer);
-          vm.map.addLayer(dynamicLayer1);
-          let point = new Point({
-            x: Number(vm.location.longitude),
-            y: Number(vm.location.latitude),
-            spatialReference: {
-              wkid: 4490
-            }
+          const imageLayer = new MapImageLayer({
+            url: "/map/arcgis/rest/services/NTWD/NTWDMapService/MapServer"
           });
+          const dynamicBasemap = new Basemap({
+            baseLayers: [dynamicLayer],
+            id: "dynamicLayer"
+          });
+          const myMap = new Map({
+            basemap: dynamicBasemap
+          });
+          vm.map = myMap;
+          myMap.add(imageLayer);
           // let point = new Point({
           //   x: 120.86448335647579,
           //   y: 32.00571294529357,
@@ -190,6 +168,22 @@ export default {
           //     wkid: 4490
           //   }
           // });
+          let point = new Point({
+            x: Number(vm.location.longitude),
+            y: Number(vm.location.latitude),
+            spatialReference: {
+              wkid: 4490
+            }
+          });
+          const myView = new MapView({
+            container: "map",
+            map: myMap,
+            zoom: 13,
+            logo: false,
+            slider: false
+          });
+          vm.view = myView;
+
           if (vm.$route.query.companyID) {
             http
               .get(api.COMPANYINFO, {
@@ -207,28 +201,17 @@ export default {
                       wkid: 4490
                     }
                   });
-                  vm.map.centerAndZoom(point1, 18);
-                  vm.isShowEnterprise = true;
-                  if (
-                    !resp.data.data.claimStatus &&
-                    resp.data.data.claimStatus !== 0
-                  ) {
-                    vm.isShowEntry = true;
-                  } else {
-                    vm.isShowEntry = false;
-                  }
-                  if (
-                    resp.data.data.myClaimStatus &&
-                    resp.data.data.claimStatus
-                  ) {
-                    vm.isShowGetEntry = true;
-                  } else {
-                    vm.isShowGetEntry = false;
-                  }
+                  vm.view.goTo({
+                    target: point1,
+                    zoom: 20
+                  });
                 }
               });
           } else {
-            vm.map.centerAndZoom(point, 16);
+            vm.view.goTo({
+              target: point,
+              zoom: 16
+            });
           }
           var bluelocSymbol = new PictureMarkerSymbol(blueloc, 24, 26);
           var startPointGraphic = new Graphic(point, bluelocSymbol);
@@ -236,26 +219,26 @@ export default {
             id: "location"
           });
           graphiclayer.add(startPointGraphic);
-          vm.map.addLayer(graphiclayer);
+          vm.map.add(graphiclayer);
           Indicator.close();
-          vm.map.on("click", function(result) {
-            Indicator.open();
-            let identifyTask = new IdentifyTask(
-              "/map/arcgis/rest/services/NTWD/NTWDMapService/MapServer"
-            );
-            let identifyParams = new IdentifyParameters();
-            identifyParams.tolerance = 20;
-            identifyParams.returnGeometry = false;
-            identifyParams.layerIds = [0];
-            identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
-            identifyParams.width = vm.map.width;
-            identifyParams.height = vm.map.height;
-            identifyParams.geometry = result.mapPoint;
-            identifyParams.mapExtent = vm.map.extent;
-            identifyTask.execute(identifyParams).addCallback(resp => {
-              if (resp[0]) {
+          vm.view.on("click", function(result) {
+            var queryTask = new QueryTask({
+              url: "/map/arcgis/rest/services/NTWD/NTWDMapService/MapServer/0"
+            });
+            var circle = new Circle(result.mapPoint, {
+              radius: 40
+            });
+            var query = new Query({
+              returnGeometry: true,
+              where: "1=1",
+              outFields: ["*"]
+            });
+            query.geometry = circle;
+            query.distance = 20;
+            queryTask.execute(query).then(resp => {
+              if (resp.features[0]) {
                 let params = {
-                  companyID: resp[0].feature.attributes.ID
+                  companyID: resp.features[0].attributes.ID
                 };
                 http.get(api.COMPANYINFO, params).then(resp => {
                   Indicator.close();
@@ -284,7 +267,6 @@ export default {
               }
             });
           });
-          // vm.map.add(startPointGraphic);
         });
     },
     goToClaim() {
@@ -300,55 +282,22 @@ export default {
       this.companyName = item.companyName;
       this.isWatchCompanyName = false;
       this.isShowSearchList = false;
-      esriLoader
-        .loadModules([
-          "esri/map",
-          "esri/geometry/Point",
-          "dojo/colors",
-          "esri/graphic",
-          "esri/layers/ArcGISTiledMapServiceLayer",
-          "esri/layers/ArcGISDynamicMapServiceLayer",
-          "esri/layers/FeatureLayer",
-          "esri/geometry/Extent",
-          "esri/renderers/HeatmapRenderer",
-          "esri/config",
-          "esri/symbols/PictureMarkerSymbol",
-          "esri/symbols/SimpleMarkerSymbol",
-          "esri/symbols/TextSymbol",
-          "esri/renderers/ClassBreaksRenderer",
-          "esri/symbols/SimpleFillSymbol",
-          "esri/symbols/SimpleLineSymbol"
-          // "custom/ClusterLayer"
-        ])
-        .then(function([
-          Map,
-          Point,
-          Colors,
-          Graphic,
-          ArcGISTiledMapServiceLayer,
-          ArcGISDynamicMapServiceLayer,
-          FeatureLayer,
-          Extent,
-          HeatmapRenderer,
-          esriConfig,
-          PictureMarkerSymbol,
-          SimpleMarkerSymbol,
-          TextSymbol,
-          ClassBreaksRenderer,
-          SimpleFillSymbol,
-          SimpleLineSymbol
-          // ClusterLayer
-        ]) {
-          let pointer2 = new Point({
-            x: Number(item.longitude),
-            y: Number(item.latitude),
-            spatialReference: {
-              wkid: 4490
-            }
-          });
-          console.log(pointer2);
-          vm.map.centerAndZoom(pointer2, 18);
+      esriLoader.loadModules(["esri/geometry/Point"]).then(function([
+        Point
+        // ClusterLayer
+      ]) {
+        let pointer2 = new Point({
+          x: Number(item.longitude),
+          y: Number(item.latitude),
+          spatialReference: {
+            wkid: 4490
+          }
         });
+        vm.view.goTo({
+          target: point2,
+          zoom: 20
+        });
+      });
     },
     companyNameSearch() {
       if (!this.companyName !== "") {
@@ -365,11 +314,6 @@ export default {
       LocationSdk.getLocation({
         success: res => {
           vm.location = res;
-          // Notify({
-          //   type: "primary",
-          //   message: `${vm.location.longitude};${vm.location.latitude}`
-          // });
-          // alert(vm.location.longitude);
           vm.createMap();
         },
         error: res => {
@@ -390,48 +334,44 @@ export default {
       LocationSdk.getLocation({
         success: res => {
           vm.location = res;
-          // Notify({
-          //   type: "primary",
-          //   message: `${vm.location.longitude};${vm.location.latitude}`
-          // });
           esriLoader
             .loadModules([
-              "esri/map",
+              "esri/Basemap",
+              "esri/Map",
+              "esri/layers/TileLayer",
+              "esri/layers/MapImageLayer",
               "esri/geometry/Point",
-              "dojo/colors",
-              "esri/graphic",
-              "esri/layers/ArcGISTiledMapServiceLayer",
-              "esri/layers/ArcGISDynamicMapServiceLayer",
-              "esri/layers/FeatureLayer",
-              "esri/geometry/Extent",
-              "esri/renderers/HeatmapRenderer",
-              "esri/config",
-              "esri/symbols/PictureMarkerSymbol",
+              "esri/views/MapView",
               "esri/symbols/SimpleMarkerSymbol",
-              "esri/symbols/TextSymbol",
-              "esri/renderers/ClassBreaksRenderer",
-              "esri/symbols/SimpleFillSymbol",
-              "esri/symbols/SimpleLineSymbol"
-              // "custom/ClusterLayer"
+              "esri/symbols/PictureMarkerSymbol",
+              "esri/layers/GraphicsLayer",
+              "esri/Graphic",
+              "esri/tasks/IdentifyTask",
+              "esri/tasks/support/IdentifyParameters",
+              "esri/tasks/support/Query",
+              "esri/tasks/QueryTask",
+              "esri/tasks/support/BufferParameters",
+              "esri/geometry/SpatialReference",
+              "esri/geometry/Circle"
             ])
             .then(function([
+              Basemap,
               Map,
+              TileLayer,
+              MapImageLayer,
               Point,
-              Colors,
-              Graphic,
-              ArcGISTiledMapServiceLayer,
-              ArcGISDynamicMapServiceLayer,
-              FeatureLayer,
-              Extent,
-              HeatmapRenderer,
-              esriConfig,
-              PictureMarkerSymbol,
+              MapView,
               SimpleMarkerSymbol,
-              TextSymbol,
-              ClassBreaksRenderer,
-              SimpleFillSymbol,
-              SimpleLineSymbol
-              // ClusterLayer
+              PictureMarkerSymbol,
+              GraphicsLayer,
+              Graphic,
+              IdentifyTask,
+              IdentifyParameters,
+              Query,
+              QueryTask,
+              BufferParameters,
+              SpatialReference,
+              Circle
             ]) {
               let point = new Point({
                 x: Number(vm.location.longitude),
@@ -440,13 +380,19 @@ export default {
                   wkid: 4490
                 }
               });
-              let layer = vm.map.getLayer("location");
-              layer.clear();
+              let layer = vm.map.findLayerById("location");
+              vm.map.remove(layer);
               var bluelocSymbol = new PictureMarkerSymbol(blueloc, 24, 26);
               var startPointGraphic = new Graphic(point, bluelocSymbol);
-              layer.add(startPointGraphic);
-              // vm.map.addLayer(layer);
-              vm.map.centerAndZoom(point, 16);
+              let graphiclayer = new GraphicsLayer({
+                id: "location"
+              });
+              graphiclayer.add(startPointGraphic);
+              vm.map.add(graphiclayer);
+              vm.view.goTo({
+                target: point,
+                zoom: 16
+              });
             });
         },
         error: res => {
@@ -454,7 +400,6 @@ export default {
             type: "primary",
             message: "获取定位失败" + ":" + JSON.stringify(res)
           });
-          // alert(JSON.stringify(res));
           self.location = {
             longitude: "-1",
             latitude: "-1"
@@ -464,12 +409,12 @@ export default {
     },
     unclaimCompany() {
       let vm = this;
-      Indicator.open();
       Dialog.confirm({
         title: "取消认领",
         message: "确认要取消次商铺的认领吗？"
       })
         .then(() => {
+          Indicator.open();
           http
             .post(api.UNCLAIMCOMPANY, {
               companyID: vm.id
@@ -477,7 +422,6 @@ export default {
             .then(resp => {
               Indicator.close();
               if (resp.data.success) {
-                // this.isClaimed = false;
                 vm.isShowEnterprise = false;
                 Notify({ type: "success", message: "取消成功" });
               } else {
@@ -485,7 +429,9 @@ export default {
               }
             });
         })
-        .catch(() => {});
+        .catch(() => {
+
+        });
     },
     punch() {
       let vm = this;

@@ -54,7 +54,9 @@ textarea {
 .van-action-sheet__header {
   font-family: "FZSong" !important;
 }
-
+.esri-widget {
+  display: none!important;
+}
 .van-toast__text {
   font-family: "FZSong" !important;
 }

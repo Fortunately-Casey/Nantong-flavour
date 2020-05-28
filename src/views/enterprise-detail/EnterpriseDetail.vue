@@ -19,7 +19,7 @@
               v-for="(item, index) in fileList"
               :key="index"
               @click="showImage"
-              fit="contain"
+              fit="cover"
             />
           </div>
         </scroll>

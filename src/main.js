@@ -29,7 +29,7 @@ Vue.use(Mint);
 //   url: "https://js.arcgis.com/3.28/"
 // });
 // esriLoader.loadCss("https://js.arcgis.com/3.19/dijit/themes/tundra/tundra.css");
-// esriLoader.loadCss("https://js.arcgis.com/3.19/esri/css/esri.css");
+// esriLoader.loadCss("https://js.arcgis.com/4.15/esri/css/main.css");
 // esriLoader.loadCss("/arcgis/arcgis_js_api/library/3.19/3.19/esri/css/esri.css");
 
 esriLoader.loadScript({
@@ -42,7 +42,7 @@ esriLoader.loadScript({
       }
     ]
   },
-  // url: "https://js.arcgis.com/3.19/init.js"
+  // url: "https://js.arcgis.com/4.15/init.js"
   url: "/static/arcgis/init.js"
 });
 new Vue({

@@ -180,7 +180,7 @@ export default {
 
           if (vm.$route.query.companyID) {
             http
-              .get(api.COMPANYINFO, {
+              .get(api.COMPANYINFOBYTEMP, {
                 companyID: vm.$route.query.companyID
               })
               .then(resp => {
@@ -234,7 +234,7 @@ export default {
                 let params = {
                   companyID: resp.features[0].attributes.ID
                 };
-                http.get(api.COMPANYINFO, params).then(resp => {
+                http.get(api.COMPANYINFOBYTEMP, params).then(resp => {
                   Indicator.close();
                   if (resp.data.data) {
                     vm.enterpriseName = resp.data.data.companyName;
@@ -280,7 +280,7 @@ export default {
           }
         });
         vm.view.goTo({
-          target: point2,
+          target: pointer2,
           zoom: 20
         });
       });

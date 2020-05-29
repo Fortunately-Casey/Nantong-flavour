@@ -294,7 +294,7 @@ export default {
           }
         });
         vm.view.goTo({
-          target: point2,
+          target: pointer2,
           zoom: 20
         });
       });

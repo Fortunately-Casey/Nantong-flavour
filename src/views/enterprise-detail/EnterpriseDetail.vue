@@ -1,9 +1,8 @@
 <template>
   <div class="enterprise-detail">
     <div class="top">
-      <div class="back" @click="back">
-        <van-icon name="arrow-left" />返回
-      </div>店铺详情
+      <div class="back" @click="back"><van-icon name="arrow-left" />返回</div>
+      店铺详情
     </div>
     <div class="content">
       <div class="name">{{ enterpriseName }}</div>
@@ -20,6 +19,7 @@
               :key="index"
               @click="showImage"
               fit="cover"
+              style="margin-left:10px"
             />
           </div>
         </scroll>
@@ -45,22 +45,30 @@
       </div>
       <div class="enterprise-info">
         <div class="info">
-          <div class="icon"></div>店铺说明
+          <div class="icon"></div>
+          店铺说明
         </div>
         <div class="info-text">{{ description }}</div>
       </div>
       <div class="discounts-info">
         <div class="info">
-          <div class="icon"></div>优惠信息
+          <div class="icon"></div>
+          优惠信息
         </div>
         <scroll class="wrapper">
           <ul class="offers-list">
-            <li class="offer-item" v-for="(item, index) in companyOffers" :key="index">
+            <li
+              class="offer-item"
+              v-for="(item, index) in companyOffers"
+              :key="index"
+            >
               <div class="offer-name">
                 <div class="icon"></div>
                 {{ item.offerTitle }}
               </div>
-              <div class="offer-address">活动时间:{{ item.offerStartTime + "-" + item.offerEndTime }}</div>
+              <div class="offer-address">
+                活动时间:{{ item.offerStartTime + "-" + item.offerEndTime }}
+              </div>
               <div class="offer-time">活动描述:{{ item.offerDescription }}</div>
             </li>
           </ul>

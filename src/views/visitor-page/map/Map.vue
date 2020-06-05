@@ -197,14 +197,14 @@ export default {
                   });
                   vm.view.goTo({
                     target: point1,
-                    zoom: 20
+                    zoom: 14
                   });
                 }
               });
           } else {
             vm.view.goTo({
               target: point,
-              zoom: 16
+              zoom: 9
             });
           }
           var bluelocSymbol = new PictureMarkerSymbol(blueloc, 24, 26);
@@ -281,7 +281,7 @@ export default {
         });
         vm.view.goTo({
           target: pointer2,
-          zoom: 20
+          zoom: 14
         });
       });
     },
@@ -377,7 +377,7 @@ export default {
               vm.map.add(graphiclayer);
               vm.view.goTo({
                 target: point,
-                zoom: 16
+                zoom: 9
               });
             });
         },
